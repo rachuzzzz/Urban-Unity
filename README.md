@@ -38,7 +38,7 @@ UrbanUnity is a comprehensive web-based platform that bridges the gap between ci
 
 ## Live Demo
 
-🌐 **Live Application**: [https://urbanunity.onrender.com](https://urbanunity.onrender.com)
+🌐 **Live Application**: [https://urban-unity.onrender.com](https://urban-unity.onrender.com)
 
 ### Test Accounts
 
