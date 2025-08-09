@@ -175,9 +175,9 @@ urbanunity/
 🙏 Credits
 Development Team:
 
-Raisen Varughese Thomas
-Sila Saad
-Jyothika Shaji
+Raisen Thomas,
+Sila Saad,
+Jyothika Shaji,
 Nabhan Najeeb
 
 This project was developed as a collaborative effort by our team to create a comprehensive municipal service management platform.
