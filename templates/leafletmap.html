@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Report Grievances</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 500px;
+            margin-bottom: 20px;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        form {
+            max-width: 500px;
+            margin: auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <h1>Report a Grievance</h1>
+    <div id="map"></div>
+    <form id="grievance-form">
+        <label for="location">Selected Location</label>
+        <input type="text" id="location" name="location" placeholder="Click on the map to select a location" readonly />
+        
+        <label for="title">Grievance Title</label>
+        <input type="text" id="title" name="title" placeholder="Enter the title of your grievance" required />
+        
+        <label for="description">Grievance Description</label>
+        <textarea id="description" name="description" rows="5" placeholder="Describe the issue" required></textarea>
+        
+        <button type="submit">Submit Grievance</button>
+    </form>
+
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([51.505, -0.09], 13);
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Variable to hold the marker
+        var marker;
+
+        // Event listener for map clicks
+        map.on('click', function(e) {
+            var lat = e.latlng.lat;
+            var lng = e.latlng.lng;
+
+            // Update the location input field
+            document.getElementById('location').value = `Lat: ${lat}, Lng: ${lng}`;
+
+            // Remove existing marker, if any
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            // Add a new marker at the clicked location
+            marker = L.marker([lat, lng]).addTo(map)
+                .bindPopup('Selected Location')
+                .openPopup();
+        });
+
+        // Handle form submission
+        document.getElementById('grievance-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Collect form data
+            var location = document.getElementById('location').value;
+            var title = document.getElementById('title').value;
+            var description = document.getElementById('description').value;
+
+            // For now, just log the data (can be replaced with a backend API call)
+            console.log('Grievance Submitted:', {
+                location: location,
+                title: title,
+                description: description
+            });
+
+            alert('Thank you! Your grievance has been submitted.');
+
+            // Reset the form
+            this.reset();
+
+            // Remove marker
+            if (marker) {
+                map.removeLayer(marker);
+            }
+        });
+    </script>
+</body>
+</html>

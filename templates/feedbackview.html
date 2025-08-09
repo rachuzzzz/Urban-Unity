@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Feedback Dashboard | UrbanUnity</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .feedback-card {
+            transition: transform 0.3s;
+            border-left: 4px solid #0d6efd;
+        }
+        .feedback-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .rating-stars {
+            color: #ffc107;
+        }
+        .statistics-card {
+            border-left: 4px solid #198754;
+        }
+        .filter-card {
+            background-color: #f8f9fa;
+        }
+        .rating-badge {
+            font-size: 0.85rem;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .rating-5 { background-color: #198754; color: white; }
+        .rating-4 { background-color: #0d6efd; color: white; }
+        .rating-3 { background-color: #6c757d; color: white; }
+        .rating-2 { background-color: #fd7e14; color: white; }
+        .rating-1 { background-color: #dc3545; color: white; }
+        
+        .rating-distribution {
+            height: 25px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        #chatbot-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 350px;
+        height: 500px;
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 1000;
+        transition: all 0.3s ease;
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+    #chatbot-container.minimized {
+        height: 60px;
+        width: 250px;
+    }
+    
+    #chatbot-container.hidden {
+        transform: translateY(100px);
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    .chatbot-header {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .chatbot-title {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .chatbot-controls {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .chatbot-controls button {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 0.9rem;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+    
+    .chatbot-controls button:hover {
+        opacity: 1;
+    }
+    
+    .chatbot-messages {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background-color: #f5f7fa;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .chatbot-message {
+        max-width: 80%;
+        padding: 10px 15px;
+        border-radius: 18px;
+        word-wrap: break-word;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        position: relative;
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    .user-message {
+        align-self: flex-end;
+        background-color: #e3f2fd;
+        color: #1e3c72;
+        border-bottom-right-radius: 5px;
+    }
+    
+    .bot-message {
+        align-self: flex-start;
+        background-color: white;
+        color: #333;
+        border-bottom-left-radius: 5px;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .message-timestamp {
+        font-size: 0.7rem;
+        color: #666;
+        margin-top: 4px;
+        text-align: right;
+    }
+    
+    .chatbot-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    
+    .chatbot-action {
+        background-color: #1e3c72;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .chatbot-action:hover {
+        background-color: #2a5298;
+    }
+    
+    .chatbot-input {
+        display: flex;
+        padding: 10px;
+        background-color: white;
+        border-top: 1px solid #eee;
+    }
+    
+    .chatbot-input input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        outline: none;
+        font-size: 0.9rem;
+    }
+    
+    .chatbot-input button {
+        background: #1e3c72;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        margin-left: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .chatbot-input button:hover {
+        background: #2a5298;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/manage-issues">
+                <i class="fas fa-city me-2"></i>UrbanUnity Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/manage-issues">Manage Issues</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin-feedback">
+                            <i class="fas fa-comment-dots me-1"></i>Feedback
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <a href="/logout" class="btn btn-light">
+                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-comment-dots me-2"></i>Citizen Feedback Dashboard</h2>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row g-4">
+            <!-- Feedback Statistics -->
+            <div class="col-lg-4">
+                <div class="card statistics-card h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Feedback Statistics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <h1 class="display-1 fw-bold mb-0">{{ "%.1f"|format(stats.avg_rating|float) }}</h1>
+                            <div class="rating-stars mb-2">
+                                {% for i in range(5) %}
+                                    {% if i < stats.avg_rating|int %}
+                                        <i class="fas fa-star"></i>
+                                    {% elif i < (stats.avg_rating|float) and i >= stats.avg_rating|int %}
+                                        <i class="fas fa-star-half-alt"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <p class="text-muted">Average Rating ({{ stats.total_count }} reviews)</p>
+                        </div>
+
+                        <h6 class="mb-3">Rating Distribution</h6>
+                        
+                        <!-- 5 stars -->
+                        <div class="d-flex align-items-center mb-1">
+                            <span class="me-2">5★</span>
+                            <div class="progress flex-grow-1">
+                                {% set five_percent = (stats.five_star / stats.total_count * 100) if stats.total_count > 0 else 0 %}
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ five_percent }}%" 
+                                     aria-valuenow="{{ five_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span class="ms-2 text-muted small">{{ stats.five_star }}</span>
+                        </div>
+                        
+                        <!-- 4 stars -->
+                        <div class="d-flex align-items-center mb-1">
+                            <span class="me-2">4★</span>
+                            <div class="progress flex-grow-1">
+                                {% set four_percent = (stats.four_star / stats.total_count * 100) if stats.total_count > 0 else 0 %}
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: {{ four_percent }}%" 
+                                     aria-valuenow="{{ four_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span class="ms-2 text-muted small">{{ stats.four_star }}</span>
+                        </div>
+                        
+                        <!-- 3 stars -->
+                        <div class="d-flex align-items-center mb-1">
+                            <span class="me-2">3★</span>
+                            <div class="progress flex-grow-1">
+                                {% set three_percent = (stats.three_star / stats.total_count * 100) if stats.total_count > 0 else 0 %}
+                                <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ three_percent }}%" 
+                                     aria-valuenow="{{ three_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span class="ms-2 text-muted small">{{ stats.three_star }}</span>
+                        </div>
+                        
+                        <!-- 2 stars -->
+                        <div class="d-flex align-items-center mb-1">
+                            <span class="me-2">2★</span>
+                            <div class="progress flex-grow-1">
+                                {% set two_percent = (stats.two_star / stats.total_count * 100) if stats.total_count > 0 else 0 %}
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ two_percent }}%" 
+                                     aria-valuenow="{{ two_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span class="ms-2 text-muted small">{{ stats.two_star }}</span>
+                        </div>
+                        
+                        <!-- 1 star -->
+                        <div class="d-flex align-items-center mb-1">
+                            <span class="me-2">1★</span>
+                            <div class="progress flex-grow-1">
+                                {% set one_percent = (stats.one_star / stats.total_count * 100) if stats.total_count > 0 else 0 %}
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: {{ one_percent }}%" 
+                                     aria-valuenow="{{ one_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span class="ms-2 text-muted small">{{ stats.one_star }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters and Feedback List -->
+            <div class="col-lg-8">
+                <!-- Filters -->
+                <div class="card filter-card mb-4">
+                    <div class="card-body">
+                        <h5 class="mb-3"><i class="fas fa-filter me-2"></i>Filter Feedback</h5>
+                        <form action="{{ url_for('admin_feedback') }}" method="get" class="row g-3">
+                            <div class="col-md-6">
+                                <label for="rating" class="form-label">Rating</label>
+                                <select class="form-select" id="rating" name="rating">
+                                    <option value="all" {% if rating_filter == 'all' %}selected{% endif %}>All Ratings</option>
+                                    <option value="5" {% if rating_filter == '5' %}selected{% endif %}>5 Stars</option>
+                                    <option value="4" {% if rating_filter == '4' %}selected{% endif %}>4 Stars</option>
+                                    <option value="3" {% if rating_filter == '3' %}selected{% endif %}>3 Stars</option>
+                                    <option value="2" {% if rating_filter == '2' %}selected{% endif %}>2 Stars</option>
+                                    <option value="1" {% if rating_filter == '1' %}selected{% endif %}>1 Star</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="date" class="form-label">Time Period</label>
+                                <select class="form-select" id="date" name="date">
+                                    <option value="all" {% if date_filter == 'all' %}selected{% endif %}>All Time</option>
+                                    <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Today</option>
+                                    <option value="week" {% if date_filter == 'week' %}selected{% endif %}>Last 7 Days</option>
+                                    <option value="month" {% if date_filter == 'month' %}selected{% endif %}>Last 30 Days</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">Apply Filters</button>
+                                <a href="{{ url_for('admin_feedback') }}" class="btn btn-outline-secondary">Reset</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Feedback List -->
+                <h5 class="mb-3"><i class="fas fa-list me-2"></i>Feedback List ({{ all_feedback|length }})</h5>
+                
+                {% if all_feedback %}
+                    {% for feedback in all_feedback %}
+                        <div class="card feedback-card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="mb-0">{{ feedback.first_name }} {{ feedback.last_name }}</h6>
+                                        <small class="text-muted">@{{ feedback.username }}</small>
+                                    </div>
+                                    <span class="badge rating-badge rating-{{ feedback.rating }}">{{ feedback.rating }}</span>
+                                </div>
+                                
+                                <p class="card-text mb-2">{{ feedback.feedback_text }}</p>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">Submitted: {{ feedback.submitted_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                    <div class="rating-stars small">
+                                        {% for i in range(5) %}
+                                            {% if i < feedback.rating %}
+                                                <i class="fas fa-star"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>No feedback found with the selected filters.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">© 2023 UrbanUnity. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">Admin Dashboard</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let chatbotVisible = false;
+    
+    function toggleChatbot() {
+        const chatbot = document.getElementById('chatbot-container');
+        if (chatbot.classList.contains('minimized')) {
+            chatbot.classList.remove('minimized');
+            chatbotVisible = true;
+        } else {
+            minimizeChatbot();
+        }
+    }
+    
+    function minimizeChatbot() {
+        document.getElementById('chatbot-container').classList.add('minimized');
+        chatbotVisible = false;
+    }
+    
+    function closeChatbot() {
+        document.getElementById('chatbot-container').classList.add('hidden');
+    }
+    
+    function openChatbot() {
+        const chatbot = document.getElementById('chatbot-container');
+        chatbot.classList.remove('hidden');
+        chatbot.classList.remove('minimized');
+        chatbotVisible = true;
+    }
+    
+    function handleChatInput(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    }
+    
+    function sendMessage() {
+        const input = document.getElementById('chatbot-input');
+        const message = input.value.trim();
+        
+        if (message) {
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Simulate bot response (replace with actual API call)
+            setTimeout(() => {
+                const botResponse = getBotResponse(message);
+                addMessage(botResponse.text, 'bot', botResponse.actions);
+            }, 800);
+        }
+    }
+    
+    function addMessage(text, sender, actions = null) {
+        const messagesContainer = document.getElementById('chatbot-messages');
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chatbot-message', `${sender}-message`);
+        
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        messageElement.innerHTML = `
+            ${text}
+            <div class="message-timestamp">${timeString}</div>
+            ${actions ? createActionButtons(actions) : ''}
+        `;
+        
+        messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    function createActionButtons(actions) {
+        let buttonsHTML = '<div class="chatbot-actions">';
+        actions.forEach(action => {
+            if (action.type === 'navigate') {
+                buttonsHTML += `<a href="${action.url}" class="chatbot-action">${action.text}</a>`;
+            }
+        });
+        buttonsHTML += '</div>';
+        return buttonsHTML;
+    }
+    
+    // Simple response logic (replace with your actual API calls)
+    function getBotResponse(message) {
+        const lowerMsg = message.toLowerCase();
+        
+        if (lowerMsg.includes('report') || lowerMsg.includes('issue') || lowerMsg.includes('grievance')) {
+            return {
+                text: 'You can report a new issue by clicking the button below:',
+                actions: [{
+                    type: 'navigate',
+                    url: '/report-issue',
+                    text: 'Report Issue'
+                }]
+            };
+        } else if (lowerMsg.includes('track') || lowerMsg.includes('status') || lowerMsg.includes('grievance')) {
+            return {
+                text: 'You can track your grievances here:',
+                actions: [{
+                    type: 'navigate',
+                    url: '/track-grievance',
+                    text: 'Track Grievances'
+                }]
+            };
+        } else if (lowerMsg.includes('login') || lowerMsg.includes('sign in')) {
+            return {
+                text: 'Please select your login type:',
+                actions: [
+                    {
+                        type: 'navigate',
+                        url: '/citizen-login',
+                        text: 'Citizen Login'
+                    },
+                    {
+                        type: 'navigate',
+                        url: '/admin-login',
+                        text: 'Admin Login'
+                    },
+                    {
+                        type: 'navigate',
+                        url: '/contractor-login',
+                        text: 'Contractor Login'
+                    }
+                ]
+            };
+        } else if (lowerMsg.includes('help')) {
+            return {
+                text: 'I can help you with:\n- Reporting issues\n- Tracking grievances\n- Login assistance\n- General information\n\nWhat do you need help with?'
+            };
+        } else {
+            return {
+                text: "I'm here to help with UrbanUnity services. You can ask me about reporting issues, tracking grievances, or logging in to your account."
+            };
+        }
+    }
+    
+    // Add floating chat button
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatButton = document.createElement('div');
+        chatButton.innerHTML = '<i class="fas fa-comment-dots"></i>';
+        chatButton.style.position = 'fixed';
+        chatButton.style.bottom = '30px';
+        chatButton.style.right = '30px';
+        chatButton.style.width = '60px';
+        chatButton.style.height = '60px';
+        chatButton.style.backgroundColor = '#1e3c72';
+        chatButton.style.color = 'white';
+        chatButton.style.borderRadius = '50%';
+        chatButton.style.display = 'flex';
+        chatButton.style.justifyContent = 'center';
+        chatButton.style.alignItems = 'center';
+        chatButton.style.fontSize = '1.5rem';
+        chatButton.style.cursor = 'pointer';
+        chatButton.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
+        chatButton.style.zIndex = '999';
+        chatButton.addEventListener('click', openChatbot);
+        document.body.appendChild(chatButton);
+    });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <div id="chatbot-container" class="hidden">
+        <div class="chatbot-header" onclick="toggleChatbot()">
+            <div class="chatbot-title">UrbanUnity Assistant</div>
+            <div class="chatbot-controls">
+                <button onclick="event.stopPropagation(); minimizeChatbot()"><i class="fas fa-minus"></i></button>
+                <button onclick="event.stopPropagation(); closeChatbot()"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div class="chatbot-messages" id="chatbot-messages">
+            <div class="chatbot-message bot-message">
+                Hello! I'm your UrbanUnity assistant. How can I help you today?
+                <div class="message-timestamp">Just now</div>
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbot-input" placeholder="Type your message..." onkeypress="handleChatInput(event)">
+            <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+</body>
+</html>

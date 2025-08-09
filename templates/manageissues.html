@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Issues - Urban Unity</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1050;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .vertical-nav {
+      position: fixed;
+      top: 70px;
+      left: 0;
+      width: 250px;
+      height: calc(100vh - 70px);
+      background-color: #ffffff;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      padding-top: 10px;
+      overflow-y: auto;
+      border-right: 1px solid #ccc;
+    }
+
+    .vertical-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .vertical-nav ul li {
+      padding: 15px 20px;
+      margin: 5px;
+      border-radius: 5px;
+      text-align: center;
+      transition: background-color 0.3s;
+    }
+
+    .vertical-nav ul li a {
+      display: block;
+      background-color: #007bff;
+      color: #ffffff;
+      padding: 10px 15px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-bottom: 5px;
+    }
+
+    .vertical-nav ul li a:hover {
+      background-color: #0056b3;
+    }
+
+    .content {
+      padding-top: 80px;
+      padding-left: 270px;
+      overflow-x: auto;
+    }
+
+    .dashboard-container {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-container {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    
+    .stats-card {
+      flex: 1;
+      min-width: 200px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    
+    .stats-card h3 {
+      margin-top: 0;
+      color: #333;
+    }
+    
+    .stats-card .number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #007bff;
+    }
+    
+    .chart-container {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    
+    .chart-card {
+      flex: 1;
+      min-width: 300px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-container {
+      margin-bottom: 20px;
+    }
+
+    .filter-container select {
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+
+    .filter-container button {
+      padding: 5px 10px;
+      margin-left: 10px;
+      background-color: #007bff;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .filter-container button:hover {
+      background-color: #0056b3;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+    }
+ 
+    @media (max-width: 768px) {
+      .vertical-nav {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      .content {
+        padding-left: 0;
+        padding-top: 120px;
+      }
+    }
+
+    #chatbot-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 350px;
+        height: 500px;
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 1000;
+        transition: all 0.3s ease;
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+    #chatbot-container.minimized {
+        height: 60px;
+        width: 250px;
+    }
+    
+    #chatbot-container.hidden {
+        transform: translateY(100px);
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    .chatbot-header {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .chatbot-title {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .chatbot-controls {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .chatbot-controls button {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 0.9rem;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+    
+    .chatbot-controls button:hover {
+        opacity: 1;
+    }
+    
+    .chatbot-messages {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background-color: #f5f7fa;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .chatbot-message {
+        max-width: 80%;
+        padding: 10px 15px;
+        border-radius: 18px;
+        word-wrap: break-word;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        position: relative;
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    .user-message {
+        align-self: flex-end;
+        background-color: #e3f2fd;
+        color: #1e3c72;
+        border-bottom-right-radius: 5px;
+    }
+    
+    .bot-message {
+        align-self: flex-start;
+        background-color: white;
+        color: #333;
+        border-bottom-left-radius: 5px;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .message-timestamp {
+        font-size: 0.7rem;
+        color: #666;
+        margin-top: 4px;
+        text-align: right;
+    }
+    
+    .chatbot-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    
+    .chatbot-action {
+        background-color: #1e3c72;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .chatbot-action:hover {
+        background-color: #2a5298;
+    }
+    
+    .chatbot-input {
+        display: flex;
+        padding: 10px;
+        background-color: white;
+        border-top: 1px solid #eee;
+    }
+    
+    .chatbot-input input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        outline: none;
+        font-size: 0.9rem;
+    }
+    
+    .chatbot-input button {
+        background: #1e3c72;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        margin-left: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .chatbot-input button:hover {
+        background: #2a5298;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{{ url_for('home') }}">
+        <img src="{{ url_for('static', filename='images/logos.png') }}" alt="UrbanUnity Logo" height="45">
+      </a>
+      <div class="ml-auto">
+        <span class="navbar-text">
+          <i class="bi bi-person-circle"></i> Government Official
+        </span>
+      </div>
+    </div>
+  </nav>
+  
+
+  <div class="vertical-nav">
+    <ul>
+      <li><a href="#"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+      <li><a href="#ri"><i class="bi bi-person-badge"></i> Contractor Assignments</a></li>
+      <li><a href="/admin-feedback"><i class="bi bi-chat-left-text"></i> Feedback</a></li>
+      <li><a href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+    </ul>
+  </div>
+
+  <div class="content">
+    <div class="dashboard-container">
+
+      {% if Resolved_tasks|length > 0 %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+      <i class="bi bi-info-circle"></i> 
+      <strong>{{ Resolved_tasks|length }} task(s)</strong> marked as Resolved by contractors and awaiting your verification.
+      <a href="#pending-verification" class="btn btn-sm btn-primary ms-3">Review Now</a>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+    
+      <h2><i class="bi bi-exclamation-triangle"></i> Manage Reported Issues</h2>
+      <p>Below are the reported issues from citizens. You can filter, assign to contractors, and track resolutions.</p>
+      
+      <!-- Stats Overview -->
+      <div class="stats-container">
+       <div class="stats-card">
+        <h3>Total Issues</h3>
+        <div class="number">{{ grievances|length }}</div>
+       </div>
+     <div class="stats-card">
+       <h3>Pending</h3>
+       <div class="number">{{ grievances|selectattr('status', 'equalto', 'pending')|list|length }}</div>
+      </div>
+     <div class="stats-card">
+      <h3>In Progress</h3>
+      <div class="number">{{ grievances|selectattr('status', 'equalto', 'In Progress')|list|length }}</div>
+     </div>
+    <div class="stats-card">
+      <h3>Resolved</h3>
+      <div class="number">{{ grievances|selectattr('status', 'equalto', 'Resolved')|list|length }}</div>
+    </div>
+    <div class="stats-card">
+      <h3>Completed</h3>
+      <div class="number">{{ grievances|selectattr('status', 'equalto', 'completed')|list|length }}</div>
+    </div>
+</div>
+      
+      <!-- Charts -->
+      <div class="chart-container" style="justify-content: center;">
+        <div class="chart-card" style="max-width: 500px; margin: 0 auto;">
+          <h3>Issues Overview</h3>
+          <canvas id="issuesChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Filter Section -->
+      <div class="filter-container" id="ri">
+        <form action="{{ url_for('manage_issues') }}" method="get">
+         <select name="status_filter" class="form-select">
+          <option value="all" {% if status_filter=='all' %}selected{% endif %}>All Statuses</option>
+          <option value="pending" {% if status_filter=='pending' %}selected{% endif %}>Pending</option>
+          <option value="In Progress" {% if status_filter=='In Progress' %}selected{% endif %}>In Progress</option>
+          <option value="Resolved" {% if status_filter=='Resolved' %}selected{% endif %}>Resolved (Pending Verification)</option>
+          <option value="completed" {% if status_filter=='completed' %}selected{% endif %}>Completed</option>
+         </select>
+         <button type="submit" class="btn btn-primary">Filter</button>
+       </form>
+      </div>
+
+      <div class="container mt-4">
+        <h2 class="mb-4">Manage Issues</h2>
+        {% if grievances %}
+          <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+              <tr>
+                <th>ID</th>
+                <th>User ID</th>
+                <th>Location</th>
+                <th>Description</th>
+                <th>Phone</th>
+                <th>Submitted At</th>
+                <th>Photo</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for grievance in grievances %}
+              <tr class="{% if grievance.status == 'pending' %}table-warning
+                         {% elif grievance.status == 'Resolved' %}table-warning
+                         {% elif grievance.status == 'In Progress' %}table-info
+                         {% elif grievance.status == 'completed' %}table-success{% endif %}">
+                <td>{{ loop.index }}</td>
+                <td>{{ grievance.user_id }}</td>
+                <td>{{ grievance.location }}</td>
+                <td>{{ grievance.description }}</td>
+                <td>{{ grievance.phone }}</td>
+                <td>{{ grievance.submitted_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td>
+                  {% if grievance.photo_path %}
+                    <a href="{{ grievance.photo_path }}" target="_blank" class="btn btn-sm btn-outline-primary">View Photo</a>
+                  {% else %}
+                    No Photo
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="badge {% if grievance.status == 'pending' %}bg-warning
+                                    {% elif grievance.status == 'Resolved' %}bg-warning
+                                    {% elif grievance.status == 'emergency' %}bg-danger
+                                    {% elif grievance.status == 'In Progress' %}bg-info
+                                    {% elif grievance.status == 'completed' %}bg-success
+                                    {% else %}bg-secondary{% endif %}">
+                    {% if grievance.status == 'Resolved' %}Resolved (Pending Verification){% else %}{{ grievance.status }}{% endif %}
+                  </span>
+                </td>
+                <td>
+                  {% if grievance.status == 'completed' %}
+                    <div class="d-flex align-items-center">
+                      <span class="badge bg-success me-2">Completed</span>
+                      {% if grievance.contractor_id %}
+                        {% set contractor_found = false %}
+                        {% for contractor in contractors %}
+                          {% if contractor._id == grievance.contractor_id and not contractor_found %}
+                            <small>By: {{ contractor.username }}</small>
+                            {% set contractor_found = true %}
+                          {% endif %}
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+                  {% elif grievance.status == 'Resolved' %}
+                    <div class="d-flex align-items-center">
+                      <span class="badge bg-info me-2">Pending Verification</span>
+                      {% if grievance.contractor_id %}
+                        {% set contractor_found = false %}
+                        {% for contractor in contractors %}
+                          {% if contractor._id == grievance.contractor_id and not contractor_found %}
+                            <small>By: {{ contractor.username }}</small>
+                            {% set contractor_found = true %}
+                          {% endif %}
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+                  {% elif grievance.status == 'In Progress' %}
+                    <div class="d-flex align-items-center">
+                      <span class="badge bg-info me-2">In Progress</span>
+                      {% if grievance.contractor_id %}
+                        {% set contractor_found = false %}
+                        {% for contractor in contractors %}
+                          {% if contractor._id == grievance.contractor_id and not contractor_found %}
+                            <small>Assigned to: {{ contractor.username }}</small>
+                            {% set contractor_found = true %}
+                          {% endif %}
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+                  {% else %}
+                    <form action="/assign_contractor" method="post">
+                      <input type="hidden" name="grievance_id" value="{{ grievance._id }}">
+                      <div class="input-group">
+                        <select name="contractor_id" class="form-select form-select-sm" required>
+                          <option value="">Select Contractor</option>
+                          {% for contractor in contractors %}
+                            <option value="{{ contractor._id }}">
+                              {{ contractor.username }} - {{ contractor.services_provided }}
+                            </option>
+                          {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Assign</button>
+                      </div>
+                    </form>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="alert alert-info">No grievances found.</div>
+        {% endif %}
+      </div>
+      
+      <div class="container mt-4">
+        <h3 id="pending-verification"><i class="bi bi-check2-circle"></i> Tasks Awaiting Verification</h3>
+        {% if Resolved_tasks|length > 0 %}
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead class="thead-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Location</th>
+                  <th>Description</th>
+                  <th>Submitted At</th>
+                  <th>Contractor</th>
+                  <th>Photos</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for task in Resolved_tasks %}
+                <tr class="table-info">
+                  <td>{{ loop.index }}</td>
+                  <td>{{ task.location }}</td>
+                  <td>{{ task.description }}</td>
+                  <td>{{ task.submitted_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                  <td>
+                    {% if task.contractor_id %}
+                      {% set contractor_found = false %}
+                      {% for contractor in contractors %}
+                        {% if contractor._id == task.contractor_id and not contractor_found %}
+                          {{ contractor.username }}
+                          {% set contractor_found = true %}
+                        {% endif %}
+                      {% endfor %}
+                      {% if not contractor_found %}
+                        Unknown Contractor
+                      {% endif %}
+                    {% else %}
+                      Not assigned
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="d-flex gap-2">
+                      {% if task.photo_path %}
+                        <a href="{{ task.photo_path }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                          <i class="bi bi-image"></i> Original Issue
+                        </a>
+                      {% endif %}
+                      {% if task.completion_proof_url %}
+                        <a href="{{ task.completion_proof_url }}" target="_blank" class="btn btn-sm btn-outline-success">
+                          <i class="bi bi-check-circle"></i> Proof of Fix
+                        </a>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex">
+                      <form action="/verify_task" method="post" class="me-2">
+                        <input type="hidden" name="task_id" value="{{ task._id }}">
+                        <button type="submit" class="btn btn-success btn-sm">
+                          <i class="bi bi-check-circle"></i> Verify
+                        </button>
+                      </form>
+                      <form action="/request_revision" method="post">
+                        <input type="hidden" name="task_id" value="{{ task._id }}">
+                        <button type="submit" class="btn btn-warning btn-sm">
+                          <i class="bi bi-arrow-counterclockwise"></i> Request Revision
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="alert alert-info">No tasks awaiting verification.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Get dynamic status counts from Flask
+    const statusCounts = {{ status_counts | tojson }};
+    
+    // Extract status names and counts
+    const labels = Object.keys(statusCounts);
+    const data = Object.values(statusCounts);
+    
+    // Define colors for different statuses
+    const getStatusColor = (status) => {
+      const statusColors = {
+        'pending': '#ffc107',
+        'In Progress': '#17a2b8',
+        'Resolved': '#ffc107',
+        'completed': '#28a745'
+      };
+      return statusColors[status] || '#6c757d';
+    };
+    
+    const backgroundColors = labels.map(status => getStatusColor(status));
+  
+    // Pie Chart for Issues
+    const issuesCtx = document.getElementById('issuesChart').getContext('2d');
+    const issuesChart = new Chart(issuesCtx, {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: backgroundColors,
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+
+    let chatbotVisible = false;
+    
+    function toggleChatbot() {
+        const chatbot = document.getElementById('chatbot-container');
+        if (chatbot.classList.contains('minimized')) {
+            chatbot.classList.remove('minimized');
+            chatbotVisible = true;
+        } else {
+            minimizeChatbot();
+        }
+    }
+    
+    function minimizeChatbot() {
+        document.getElementById('chatbot-container').classList.add('minimized');
+        chatbotVisible = false;
+    }
+    
+    function closeChatbot() {
+        document.getElementById('chatbot-container').classList.add('hidden');
+    }
+    
+    function openChatbot() {
+        const chatbot = document.getElementById('chatbot-container');
+        chatbot.classList.remove('hidden');
+        chatbot.classList.remove('minimized');
+        chatbotVisible = true;
+    }
+    
+    function handleChatInput(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    }
+    
+    function sendMessage() {
+        const input = document.getElementById('chatbot-input');
+        const message = input.value.trim();
+        
+        if (message) {
+            addMessage(message, 'user');
+            input.value = '';
+            
+            setTimeout(() => {
+                const botResponse = getBotResponse(message);
+                addMessage(botResponse.text, 'bot', botResponse.actions);
+            }, 800);
+        }
+    }
+    
+    function addMessage(text, sender, actions = null) {
+        const messagesContainer = document.getElementById('chatbot-messages');
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chatbot-message', `${sender}-message`);
+        
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        messageElement.innerHTML = `
+            ${text}
+            <div class="message-timestamp">${timeString}</div>
+            ${actions ? createActionButtons(actions) : ''}
+        `;
+        
+        messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    function createActionButtons(actions) {
+        let buttonsHTML = '<div class="chatbot-actions">';
+        actions.forEach(action => {
+            if (action.type === 'navigate') {
+                buttonsHTML += `<a href="${action.url}" class="chatbot-action">${action.text}</a>`;
+            }
+        });
+        buttonsHTML += '</div>';
+        return buttonsHTML;
+    }
+    
+    function getBotResponse(message) {
+        const lowerMsg = message.toLowerCase();
+        
+        if (lowerMsg.includes('report') || lowerMsg.includes('issue') || lowerMsg.includes('grievance')) {
+            return {
+                text: 'You can report a new issue by clicking the button below:',
+                actions: [{
+                    type: 'navigate',
+                    url: '/report-issue',
+                    text: 'Report Issue'
+                }]
+            };
+        } else if (lowerMsg.includes('track') || lowerMsg.includes('status') || lowerMsg.includes('grievance')) {
+            return {
+                text: 'You can track your grievances here:',
+                actions: [{
+                    type: 'navigate',
+                    url: '/track-grievance',
+                    text: 'Track Grievances'
+                }]
+            };
+        } else if (lowerMsg.includes('login') || lowerMsg.includes('sign in')) {
+            return {
+                text: 'Please select your login type:',
+                actions: [
+                    {
+                        type: 'navigate',
+                        url: '/citizen-login',
+                        text: 'Citizen Login'
+                    },
+                    {
+                        type: 'navigate',
+                        url: '/admin-login',
+                        text: 'Admin Login'
+                    },
+                    {
+                        type: 'navigate',
+                        url: '/contractor-login',
+                        text: 'Contractor Login'
+                    }
+                ]
+            };
+        } else if (lowerMsg.includes('help')) {
+            return {
+                text: 'I can help you with:\n- Reporting issues\n- Tracking grievances\n- Login assistance\n- General information\n\nWhat do you need help with?'
+            };
+        } else {
+            return {
+                text: "I'm here to help with UrbanUnity services. You can ask me about reporting issues, tracking grievances, or logging in to your account."
+            };
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatButton = document.createElement('div');
+        chatButton.innerHTML = '<i class="fas fa-comment-dots"></i>';
+        chatButton.style.position = 'fixed';
+        chatButton.style.bottom = '30px';
+        chatButton.style.right = '30px';
+        chatButton.style.width = '60px';
+        chatButton.style.height = '60px';
+        chatButton.style.backgroundColor = '#1e3c72';
+        chatButton.style.color = 'white';
+        chatButton.style.borderRadius = '50%';
+        chatButton.style.display = 'flex';
+        chatButton.style.justifyContent = 'center';
+        chatButton.style.alignItems = 'center';
+        chatButton.style.fontSize = '1.5rem';
+        chatButton.style.cursor = 'pointer';
+        chatButton.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
+        chatButton.style.zIndex = '999';
+        chatButton.addEventListener('click', openChatbot);
+        document.body.appendChild(chatButton);
+    });
+  </script>
+
+<div id="chatbot-container" class="hidden">
+  <div class="chatbot-header" onclick="toggleChatbot()">
+      <div class="chatbot-title">UrbanUnity Assistant</div>
+      <div class="chatbot-controls">
+          <button onclick="event.stopPropagation(); minimizeChatbot()"><i class="fas fa-minus"></i></button>
+          <button onclick="event.stopPropagation(); closeChatbot()"><i class="fas fa-times"></i></button>
+      </div>
+  </div>
+  <div class="chatbot-messages" id="chatbot-messages">
+      <div class="chatbot-message bot-message">
+          Hello! I'm your UrbanUnity assistant. How can I help you today?
+          <div class="message-timestamp">Just now</div>
+      </div>
+  </div>
+  <div class="chatbot-input">
+      <input type="text" id="chatbot-input" placeholder="Type your message..." onkeypress="handleChatInput(event)">
+      <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
+</body>
+</html>

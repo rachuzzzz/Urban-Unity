@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: url("{{ url_for('static', filename='images/gbanner.jpg') }}") no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      margin: 0;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .navbar {
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      animation: slideIn 0.5s ease-in-out;
+    }
+
+    .navbar-brand img {
+      height: 35px;
+    }
+
+    .navbar .ms-auto {
+      display: flex;
+      gap: 15px;
+    }
+
+    .content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding-top: 80px;
+    }
+
+    .form-container {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      opacity: 0;
+      animation: fadeInUp 1.5s ease-out forwards;
+    }
+
+    .form-container img {
+      width: 80px;
+      margin-bottom: 15px;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 20px;
+      color: #002752;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .input-error {
+      border: 1px solid #dc3545;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #002752;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #001a3d;
+    }
+
+    .help-text {
+      margin-top: 15px;
+      font-size: 13px;
+    }
+
+    .error-message {
+      color: #dc3545;
+      font-size: 14px;
+      margin-top: -10px;
+      margin-bottom: 15px;
+      text-align: left;
+      display: none;
+    }
+
+    .alert {
+      margin-bottom: 15px;
+      border-radius: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @media screen and (max-width: 600px) {
+      .form-container {
+        padding: 20px;
+        max-width: 90%;
+      }
+    }
+
+    #chatbot-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 350px;
+        height: 500px;
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 1000;
+        transition: all 0.3s ease;
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+    #chatbot-container.minimized {
+        height: 60px;
+        width: 250px;
+    }
+    
+    #chatbot-container.hidden {
+        transform: translateY(100px);
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    .chatbot-header {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .chatbot-title {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .chatbot-controls {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .chatbot-controls button {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 0.9rem;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+    
+    .chatbot-controls button:hover {
+        opacity: 1;
+    }
+    
+    .chatbot-messages {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background-color: #f5f7fa;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .chatbot-message {
+        max-width: 80%;
+        padding: 10px 15px;
+        border-radius: 18px;
+        word-wrap: break-word;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        position: relative;
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    .user-message {
+        align-self: flex-end;
+        background-color: #e3f2fd;
+        color: #1e3c72;
+        border-bottom-right-radius: 5px;
+    }
+    
+    .bot-message {
+        align-self: flex-start;
+        background-color: white;
+        color: #333;
+        border-bottom-left-radius: 5px;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .message-timestamp {
+        font-size: 0.7rem;
+        color: #666;
+        margin-top: 4px;
+        text-align: right;
+    }
+    
+    .chatbot-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    
+    .chatbot-action {
+        background-color: #1e3c72;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .chatbot-action:hover {
+        background-color: #2a5298;
+    }
+    
+    .chatbot-input {
+        display: flex;
+        padding: 10px;
+        background-color: white;
+        border-top: 1px solid #eee;
+    }
+    
+    .chatbot-input input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        outline: none;
+        font-size: 0.9rem;
+    }
+    
+    .chatbot-input button {
+        background: #1e3c72;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        margin-left: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .chatbot-input button:hover {
+        background: #2a5298;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid d-flex justify-content-between">
+      <a class="navbar-brand" href="{{ url_for('home') }}">
+        <img src="{{ url_for('static', filename='images/logos.png') }}" alt="UrbanUnity Logo">
+      </a>
+      <div class="ms-auto d-flex gap-3">
+        <a href="{{ url_for('citizen_login') }}" class="btn btn-link">Citizen Login</a>
+        <a href="{{ url_for('contractor_login') }}" class="btn btn-primary">Contractor Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="content">
+    <div class="form-container">
+      <img src="{{ url_for('static', filename='images/gov.jpg') }}" alt="Admin Logo">
+      <h1>Admin Login</h1>
+      
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} mb-3">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      
+      <form id="adminLoginForm" action="{{ url_for('admin_login') }}" method="POST" novalidate>
+        <div class="form-group mb-3">
+          <input type="text" id="government_id" name="government_id" placeholder="Admin ID" 
+                 class="{% if errors and errors.government_id %}input-error{% endif %}"
+                 value="{{ government_id|default('') }}" required>
+          <span id="error-government_id" class="error-message">{{ errors.government_id if errors and errors.government_id }}</span>
+        </div>
+        
+        <div class="form-group mb-3">
+          <input type="password" id="password" name="password" placeholder="Password"
+                 class="{% if errors and errors.password %}input-error{% endif %}" required>
+          <span id="error-password" class="error-message">{{ errors.password if errors and errors.password }}</span>
+        </div>
+        
+        <button type="submit" id="loginButton">Login</button>
+      </form>
+      
+      <div class="help-text"></div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('adminLoginForm');
+      const governmentId = document.getElementById('government_id');
+      const password = document.getElementById('password');
+      const errorGovernmentId = document.getElementById('error-government_id');
+      const errorPassword = document.getElementById('error-password');
+      const loginButton = document.getElementById('loginButton');
+
+      function validateField(input, errorElement, message) {
+        if (input.value.trim() === '') {
+          errorElement.textContent = message;
+          errorElement.style.display = 'block';
+          input.classList.add('input-error');
+          return false;
+        } else {
+          errorElement.style.display = 'none';
+          input.classList.remove('input-error');
+          return true;
+        }
+      }
+
+      // Show validation errors immediately if they exist
+      if (errorGovernmentId && errorGovernmentId.textContent) {
+        errorGovernmentId.style.display = 'block';
+      }
+      
+      if (errorPassword && errorPassword.textContent) {
+        errorPassword.style.display = 'block';
+      }
+
+      // Live validation as user types
+      governmentId.addEventListener('input', function() {
+        validateField(governmentId, errorGovernmentId, 'Admin ID is required');
+      });
+
+      password.addEventListener('input', function() {
+        validateField(password, errorPassword, 'Password is required');
+      });
+
+      // Form submission validation
+      form.addEventListener('submit', function(event) {
+        let isValid = true;
+        
+        if (!validateField(governmentId, errorGovernmentId, 'Admin ID is required')) {
+          isValid = false;
+        }
+        
+        if (!validateField(password, errorPassword, 'Password is required')) {
+          isValid = false;
+        }
+        
+        if (!isValid) {
+          event.preventDefault();
+        } else {
+          // Disable button to prevent multiple submissions
+          loginButton.disabled = true;
+          loginButton.textContent = "Logging in...";
+        }
+      });
+    });
+
+    let chatbotVisible = false;
+    
+    function toggleChatbot() {
+        const chatbot = document.getElementById('chatbot-container');
+        if (chatbot.classList.contains('minimized')) {
+            chatbot.classList.remove('minimized');
+            chatbotVisible = true;
+        } else {
+            minimizeChatbot();
+        }
+    }
+    
+    function minimizeChatbot() {
+        document.getElementById('chatbot-container').classList.add('minimized');
+        chatbotVisible = false;
+    }
+    
+    function closeChatbot() {
+        document.getElementById('chatbot-container').classList.add('hidden');
+    }
+    
+    function openChatbot() {
+        const chatbot = document.getElementById('chatbot-container');
+        chatbot.classList.remove('hidden');
+        chatbot.classList.remove('minimized');
+        chatbotVisible = true;
+    }
+    
+    function handleChatInput(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    }
+    
+    function sendMessage() {
+        const input = document.getElementById('chatbot-input');
+        const message = input.value.trim();
+        
+        if (message) {
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Simulate bot response (replace with actual API call)
+            setTimeout(() => {
+                const botResponse = getBotResponse(message);
+                addMessage(botResponse.text, 'bot', botResponse.actions);
+            }, 800);
+        }
+    }
+    
+    function addMessage(text, sender, actions = null) {
+        const messagesContainer = document.getElementById('chatbot-messages');
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chatbot-message', `${sender}-message`);
+        
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        messageElement.innerHTML = `
+            ${text}
+            <div class="message-timestamp">${timeString}</div>
+            ${actions ? createActionButtons(actions) : ''}
+        `;
+        
+        messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    function createActionButtons(actions) {
+        let buttonsHTML = '<div class="chatbot-actions">';
+        actions.forEach(action => {
+            if (action.type === 'navigate') {
+                buttonsHTML += `<a href="${action.url}" class="chatbot-action">${action.text}</a>`;
+            }
+        });
+        buttonsHTML += '</div>';
+        return buttonsHTML;
+    }
+    
+    // Simple response logic (replace with your actual API calls)
+    function getBotResponse(message) {
+        const lowerMsg = message.toLowerCase();
+        
+        if (lowerMsg.includes('report') || lowerMsg.includes('issue') || lowerMsg.includes('grievance')) {
+            return {
+                text: 'You can report a new issue by clicking the button below:',
+                actions: [{
+                    type: 'navigate',
+                    url: '/report-issue',
+                    text: 'Report Issue'
+                }]
+            };
+        } else if (lowerMsg.includes('track') || lowerMsg.includes('status') || lowerMsg.includes('grievance')) {
+            return {
+                text: 'You can track your grievances here:',
+                actions: [{
+                    type: 'navigate',
+                    url: '/track-grievance',
+                    text: 'Track Grievances'
+                }]
+            };
+        } else if (lowerMsg.includes('login') || lowerMsg.includes('sign in')) {
+            return {
+                text: 'Please select your login type:',
+                actions: [
+                    {
+                        type: 'navigate',
+                        url: '/citizen-login',
+                        text: 'Citizen Login'
+                    },
+                    {
+                        type: 'navigate',
+                        url: '/admin-login',
+                        text: 'Admin Login'
+                    },
+                    {
+                        type: 'navigate',
+                        url: '/contractor-login',
+                        text: 'Contractor Login'
+                    }
+                ]
+            };
+        } else if (lowerMsg.includes('help')) {
+            return {
+                text: 'I can help you with:\n- Reporting issues\n- Tracking grievances\n- Login assistance\n- General information\n\nWhat do you need help with?'
+            };
+        } else {
+            return {
+                text: "I'm here to help with UrbanUnity services. You can ask me about reporting issues, tracking grievances, or logging in to your account."
+            };
+        }
+    }
+    
+    // Add floating chat button
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatButton = document.createElement('div');
+        chatButton.innerHTML = '<i class="fas fa-comment-dots"></i>';
+        chatButton.style.position = 'fixed';
+        chatButton.style.bottom = '30px';
+        chatButton.style.right = '30px';
+        chatButton.style.width = '60px';
+        chatButton.style.height = '60px';
+        chatButton.style.backgroundColor = '#1e3c72';
+        chatButton.style.color = 'white';
+        chatButton.style.borderRadius = '50%';
+        chatButton.style.display = 'flex';
+        chatButton.style.justifyContent = 'center';
+        chatButton.style.alignItems = 'center';
+        chatButton.style.fontSize = '1.5rem';
+        chatButton.style.cursor = 'pointer';
+        chatButton.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
+        chatButton.style.zIndex = '999';
+        chatButton.addEventListener('click', openChatbot);
+        document.body.appendChild(chatButton);
+    });
+  </script>
+
+<div id="chatbot-container" class="hidden">
+  <div class="chatbot-header" onclick="toggleChatbot()">
+      <div class="chatbot-title">UrbanUnity Assistant</div>
+      <div class="chatbot-controls">
+          <button onclick="event.stopPropagation(); minimizeChatbot()"><i class="fas fa-minus"></i></button>
+          <button onclick="event.stopPropagation(); closeChatbot()"><i class="fas fa-times"></i></button>
+      </div>
+  </div>
+  <div class="chatbot-messages" id="chatbot-messages">
+      <div class="chatbot-message bot-message">
+          Hello! I'm your UrbanUnity assistant. How can I help you today?
+          <div class="message-timestamp">Just now</div>
+      </div>
+  </div>
+  <div class="chatbot-input">
+      <input type="text" id="chatbot-input" placeholder="Type your message..." onkeypress="handleChatInput(event)">
+      <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

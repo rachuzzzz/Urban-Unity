@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Urban Unity Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1050;
+    }
+
+    .navbar-brand {
+  margin-right: auto; /* Pushes other content to the right */
+  }
+
+    .navbar-brand img {
+      height: 45px;
+    }
+
+    .btn-outline-primary {
+      color: #005bb5;
+      border: 1px solid #005bb5;
+      background-color: transparent;
+    }
+
+    .btn-outline-primary:hover {
+      background-color: #005bb5;
+      color: #ffffff;
+    }
+
+    .btn-primary {
+      background-color: #005bb5;
+      color: #ffffff;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #003f8a;
+      color: #ffffff;
+    }
+
+    .vertical-nav {
+      position: fixed;
+      top: 70px; /* Start below the horizontal navbar */
+      left: 0;
+      width: 250px;
+      height: calc(100vh - 70px); /* Fill remaining height */
+      background-color: #f8f9fa;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      z-index: 1040;
+    }
+
+    .vertical-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .vertical-nav ul li {
+      padding: 15px 20px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .vertical-nav ul li a {
+      text-decoration: none;
+      color: #005bb5;
+      font-size: 16px;
+    }
+
+    .content {
+      padding-top: 70px;
+      padding-left: 260px; /* Account for the fixed vertical navbar width */
+    }
+
+    .slider-container {
+      width: 100%; /* Slider will take full remaining width */
+      max-width: 100%; /* Ensure no overflow */
+      margin: 0 auto;
+    }
+
+    .carousel-inner {
+      width: 100%; /* Fill the full container width */
+    }
+
+    .carousel-item img {
+      width: 100%; /* Fill the full width of the container */
+      height: 60vh; /* Set a fixed height relative to the viewport */
+      object-fit: cover; /* Ensure the image scales and covers the area */
+    }
+
+    /* Transparent background for carousel captions */
+    .carousel-caption {
+      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+      color: white; /* White text for better contrast */
+      padding: 15px;
+      position: absolute; /* Position the caption over the image */
+      bottom: 0; /* Position the caption at the bottom */
+      left: 0; /* Align to the left */
+      right: 0; /* Align to the right */
+      width: 100%; /* Ensure it takes the full width */
+      text-align: center; /* Center the text inside */
+      border-radius: 5px;
+    }
+
+    /* Added styles for dashboard cards and stats */
+    .dashboard-section {
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+
+    .stats-card {
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      height: 100%;
+      transition: transform 0.3s;
+      border-left: 5px solid #005bb5;
+    }
+
+    .stats-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stats-icon {
+      font-size: 2.5rem;
+      color: #005bb5;
+      margin-bottom: 15px;
+    }
+
+    .stats-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .stats-label {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .news-card {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      background-color: #fff;
+    }
+
+    .news-image {
+      height: 180px;
+      overflow: hidden;
+    }
+
+    .news-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .news-content {
+      padding: 15px;
+    }
+
+    .news-date {
+      color: #666;
+      font-size: 0.8rem;
+      margin-bottom: 5px;
+    }
+
+    .news-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #005bb5;
+    }
+
+    .section-title {
+      color: #005bb5;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #eaeaea;
+    }
+
+    .progress-tracker {
+      margin-bottom: 15px;
+    }
+
+    .progress-title {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .progress {
+      height: 10px;
+      border-radius: 5px;
+    }
+
+    footer {
+      background-color: #f8f9fa;
+      padding: 20px 0;
+      margin-top: 30px;
+      border-top: 1px solid #eaeaea;
+      text-align: center;
+      margin-left: 250px; /* Account for vertical nav */
+    }
+
+    .quick-action-btn {
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      transition: all 0.3s;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .quick-action-btn i {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .quick-action-btn:hover {
+      transform: scale(1.05);
+    }
+
+    #chatbot-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 350px;
+        height: 500px;
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 1000;
+        transition: all 0.3s ease;
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+    #chatbot-container.minimized {
+        height: 60px;
+        width: 250px;
+    }
+    
+    #chatbot-container.hidden {
+        transform: translateY(100px);
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    .chatbot-header {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .chatbot-title {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .chatbot-controls {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .chatbot-controls button {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 0.9rem;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+    
+    .chatbot-controls button:hover {
+        opacity: 1;
+    }
+    
+    .chatbot-messages {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background-color: #f5f7fa;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .chatbot-message {
+        max-width: 80%;
+        padding: 10px 15px;
+        border-radius: 18px;
+        word-wrap: break-word;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        position: relative;
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    .user-message {
+        align-self: flex-end;
+        background-color: #e3f2fd;
+        color: #1e3c72;
+        border-bottom-right-radius: 5px;
+    }
+    
+    .bot-message {
+        align-self: flex-start;
+        background-color: white;
+        color: #333;
+        border-bottom-left-radius: 5px;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .message-timestamp {
+        font-size: 0.7rem;
+        color: #666;
+        margin-top: 4px;
+        text-align: right;
+    }
+    
+    .chatbot-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    
+    .chatbot-action {
+        background-color: #1e3c72;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .chatbot-action:hover {
+        background-color: #2a5298;
+    }
+    
+    .chatbot-input {
+        display: flex;
+        padding: 10px;
+        background-color: white;
+        border-top: 1px solid #eee;
+    }
+    
+    .chatbot-input input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        outline: none;
+        font-size: 0.9rem;
+    }
+    
+    .chatbot-input button {
+        background: #1e3c72;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        margin-left: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .chatbot-input button:hover {
+        background: #2a5298;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+  </style>
+</head>
+<body>
+
+
+<!-- Horizontal Navbar -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid"> <!-- Changed to container-fluid for full width -->
+    <!-- Logo on the left -->
+    <a class="navbar-brand me-auto" href="{{ url_for('home') }}"> <!-- Added me-auto -->
+      <img src="{{ url_for('static', filename='images/logos.png') }}" alt="UrbanUnity Logo">
+    </a>
+    
+    <!-- User controls on the right -->
+    <div class="d-flex">
+      <span class="me-3 text-primary fw-bold">Welcome, {{ username }}</span>
+      <a href="{{ url_for('logout') }}" class="btn btn-outline-primary me-2">Logout</a>
+      <a href="{{ url_for('report_issue') }}" class="btn btn-primary">
+        <i class="bi bi-plus"></i> Report Issue
+      </a>              
+    </div>
+  </div>
+</nav>
+
+  <!-- Fixed Vertical Navbar -->
+  <div class="vertical-nav">
+    <ul>
+      <li><a href="#latest-updates">Event Updates</a></li>
+      <li><a href="{{ url_for('track_grievance') }}">Service Tracking</a></li>
+      <li><a href="{{ url_for('view_feedback') }}">Community Feedback</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <!-- Slider Container -->
+    <div class="slider-container">
+      <div id="imageCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          <!-- First Slide -->
+          <div class="carousel-item active">
+            <img src="{{ url_for('static', filename='images/image1.png') }}" class="d-block w-100" alt="Slide 1">
+            <div class="carousel-caption d-none d-md-block">
+              <h5>Improving Road Infrastructure for Better Connectivity</h5>
+              <p>Watch as we enhance road quality to ensure smoother and safer commutes. UrbanUnity is committed to upgrading our city's roads to improve accessibility and mobility for all citizens.</p>
+            </div>
+          </div>
+          <!-- Second Slide -->
+          <div class="carousel-item">
+            <img src="{{ url_for('static', filename='images/image2.png') }}" class="d-block w-100" alt="Slide 2">
+            <div class="carousel-caption d-none d-md-block">
+              <h5>Lighting Up Our Community</h5>
+              <p>Ensuring brighter streets and safer nights, one light at a time. UrbanUnity is dedicated to maintaining well-lit spaces for all.</p>
+            </div>
+          </div>
+          <!-- Third Slide -->
+          <div class="carousel-item">
+            <img src="{{ url_for('static', filename='images/image3.png') }}" class="d-block w-100" alt="Slide 3">
+            <div class="carousel-caption d-none d-md-block">
+              <h5>Sealing the Gaps for Smoother Journeys!</h5>
+              <p>Working to eliminate road cracks and gaps, ensuring a safer and more comfortable drive for all. UrbanUnity is committed to keeping our roads in top condition.</p>
+            </div>
+          </div>
+        </div>
+        <!-- Carousel Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Action Buttons -->
+    <div class="dashboard-section">
+      <h3 class="section-title">Quick Actions</h3>
+      <div class="row g-4">
+        <div class="col-md-3">
+          <div class="quick-action-btn bg-light">
+            <i class="bi bi-exclamation-triangle text-warning"></i>
+            <h5>Report Issue</h5>
+            <p class="mb-0 text-muted small">Submit new community issues</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="quick-action-btn bg-light">
+            <i class="bi bi-calendar-event text-success"></i>
+            <h5>Community Events</h5>
+            <p class="mb-0 text-muted small">View upcoming local events</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="quick-action-btn bg-light">
+            <i class="bi bi-search text-info"></i>
+            <h5>Track Request</h5>
+            <p class="mb-0 text-muted small">Check status of your reports</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <a href="{{ url_for('view_feedback') }}" style="text-decoration: none;">
+            <div class="quick-action-btn bg-light">
+              <i class="bi bi-chat-dots text-primary"></i>
+              <h5>Community Feedback</h5>
+              <p class="mb-0 text-muted small">Share your feedback with us</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="dashboard-section">
+      <h3 class="section-title">Community Statistics</h3>
+      <div class="row g-4">
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-icon">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="stats-number">487</div>
+            <div class="stats-label">Issues Resolved</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-icon">
+              <i class="bi bi-clock"></i>
+            </div>
+            <div class="stats-number">126</div>
+            <div class="stats-label">Pending Issues</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-icon">
+              <i class="bi bi-calendar-check"></i>
+            </div>
+            <div class="stats-number">23</div>
+            <div class="stats-label">Upcoming Events</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-icon">
+              <i class="bi bi-people"></i>
+            </div>
+            <div class="stats-number">1,452</div>
+            <div class="stats-label">Active Citizens</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project Progress Section -->
+    <div class="dashboard-section">
+      <h3 class="section-title">Ongoing Projects</h3>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title">Road Maintenance - Kakkanad</h5>
+              <div class="progress-tracker">
+                <div class="progress-title">
+                  <span>Progress</span>
+                  <span>75%</span>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar bg-success" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+              <p class="card-text">Major road repairs on Rajagiri Valley are 75% complete, with expected completion by April 15th.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title">Street Lighting Upgrade - Kakkanad</h5>
+              <div class="progress-tracker">
+                <div class="progress-title">
+                  <span>Progress</span>
+                  <span>40%</span>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar bg-info" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+              <p class="card-text">Installation of energy-efficient LED street lights in Infopark expressway is underway.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title">Railway Station Renovation - Thripunithara</h5>
+              <div class="progress-tracker">
+                <div class="progress-title">
+                  <span>Progress</span>
+                  <span>90%</span>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar bg-success" role="progressbar" style="width: 90%" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+              <p class="card-text">Renovation of Thripunithara railway station facilities is nearly complete. New platforms has been installed.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title">Drainage System Upgrade - Edapally</h5>
+              <div class="progress-tracker">
+                <div class="progress-title">
+                  <span>Progress</span>
+                  <span>30%</span>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar bg-warning" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+              <p class="card-text">Improvements to the drainage system in LULU Mall area to prevent flooding during rainy seasons.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- News and Updates Section -->
+    <div class="dashboard-section" id="latest-updates">
+      <h3 class="section-title">Latest News & Updates</h3>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="news-card">
+            <div class="news-image">
+              <img src="{{ url_for('static', filename='images/e1.jpg') }}">
+            </div>
+            <div class="news-content">
+              <div class="news-date">March 28, 2025</div>
+              <h5 class="news-title">Community Clean-up Drive a Huge Success</h5>
+              <p>Over 200 volunteers participated in last weekend's community clean-up initiative, collecting over 500 bags of trash from our public spaces.</p>
+              <a href="#" class="btn btn-sm btn-outline-primary">Read More</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="news-card">
+            <div class="news-image">
+              <img src="{{ url_for('static', filename='images/e2.jpg') }}">
+            </div>
+            <div class="news-content">
+              <div class="news-date">March 25, 2025</div>
+              <h5 class="news-title">New Recycling Program Launches Next Month</h5>
+              <p>The city is introducing an improved recycling program starting May 1st. Look out for new bins and updated collection schedules.</p>
+              <a href="#" class="btn btn-sm btn-outline-primary">Read More</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="news-card">
+            <div class="news-image">
+              <img src="{{ url_for('static', filename='images/e3.jpg') }}">
+            </div>
+            <div class="news-content">
+              <div class="news-date">March 20, 2025</div>
+              <h5 class="news-title">City Council Approves Sidewalk Expansion</h5>
+              <p>The city council has approved a $2.5 million project to expand pedestrian sidewalks in the downtown area, improving walkability.</p>
+              <a href="#" class="btn btn-sm btn-outline-primary">Read More</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <p>&copy; 2025 Urban Unity. All rights reserved.</p>
+            <div class="d-flex justify-content-center gap-3">
+              <a href="#" class="text-secondary"><i class="bi bi-facebook"></i></a>
+              <a href="#" class="text-secondary"><i class="bi bi-twitter"></i></a>
+              <a href="#" class="text-secondary"><i class="bi bi-instagram"></i></a>
+              <a href="#" class="text-secondary"><i class="bi bi-linkedin"></i></a>
+            </div>
+            <p class="mt-2 small text-muted">Contact: support@urbanunity.com | (555) 123-4567</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <div id="chatbot-container" class="hidden">
+    <div class="chatbot-header" onclick="toggleChatbot()">
+        <div class="chatbot-title">UrbanUnity Assistant</div>
+        <div class="chatbot-controls">
+            <button onclick="event.stopPropagation(); minimizeChatbot()"><i class="fas fa-minus"></i></button>
+            <button onclick="event.stopPropagation(); closeChatbot()"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+    <div class="chatbot-messages" id="chatbot-messages">
+        <div class="chatbot-message bot-message">
+            Hello! I'm your UrbanUnity assistant. How can I help you today?
+            <div class="message-timestamp">Just now</div>
+        </div>
+    </div>
+    <div class="chatbot-input">
+        <input type="text" id="chatbot-input" placeholder="Type your message..." onkeypress="handleChatInput(event)">
+        <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+</div>
+
+<script>
+  let chatbotVisible = false;
+    
+    function toggleChatbot() {
+        const chatbot = document.getElementById('chatbot-container');
+        if (chatbot.classList.contains('minimized')) {
+            chatbot.classList.remove('minimized');
+            chatbotVisible = true;
+        } else {
+            minimizeChatbot();
+        }
+    }
+    
+    function minimizeChatbot() {
+        document.getElementById('chatbot-container').classList.add('minimized');
+        chatbotVisible = false;
+    }
+    
+    function closeChatbot() {
+        document.getElementById('chatbot-container').classList.add('hidden');
+    }
+    
+    function openChatbot() {
+        const chatbot = document.getElementById('chatbot-container');
+        chatbot.classList.remove('hidden');
+        chatbot.classList.remove('minimized');
+        chatbotVisible = true;
+    }
+    
+    function handleChatInput(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    }
+    
+    function sendMessage() {
+        const input = document.getElementById('chatbot-input');
+        const message = input.value.trim();
+        
+        if (message) {
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Simulate bot response (replace with actual API call)
+            setTimeout(() => {
+                const botResponse = getBotResponse(message);
+                addMessage(botResponse.text, 'bot', botResponse.actions);
+            }, 800);
+        }
+    }
+    
+    function addMessage(text, sender, actions = null) {
+        const messagesContainer = document.getElementById('chatbot-messages');
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chatbot-message', `${sender}-message`);
+        
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        messageElement.innerHTML = `
+            ${text}
+            <div class="message-timestamp">${timeString}</div>
+            ${actions ? createActionButtons(actions) : ''}
+        `;
+        
+        messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    function createActionButtons(actions) {
+        let buttonsHTML = '<div class="chatbot-actions">';
+        actions.forEach(action => {
+            if (action.type === 'navigate') {
+                buttonsHTML += `<a href="${action.url}" class="chatbot-action">${action.text}</a>`;
+            }
+        });
+        buttonsHTML += '</div>';
+        return buttonsHTML;
+    }
+    
+    // Simple response logic (replace with your actual API calls)
+    function getBotResponse(message) {
+        const lowerMsg = message.toLowerCase();
+        
+        if (lowerMsg.includes('report') || lowerMsg.includes('issue') || lowerMsg.includes('grievance')) {
+            return {
+                text: 'You can report a new issue by clicking the button below:',
+                actions: [{
+                    type: 'navigate',
+                    url: '/report-issue',
+                    text: 'Report Issue'
+                }]
+            };
+        } else if (lowerMsg.includes('track') || lowerMsg.includes('status') || lowerMsg.includes('grievance')) {
+            return {
+                text: 'You can track your grievances here:',
+                actions: [{
+                    type: 'navigate',
+                    url: '/track-grievance',
+                    text: 'Track Grievances'
+                }]
+            };
+        } else if (lowerMsg.includes('login') || lowerMsg.includes('sign in')) {
+            return {
+                text: 'Please select your login type:',
+                actions: [
+                    {
+                        type: 'navigate',
+                        url: '/citizen-login',
+                        text: 'Citizen Login'
+                    },
+                    {
+                        type: 'navigate',
+                        url: '/admin-login',
+                        text: 'Admin Login'
+                    },
+                    {
+                        type: 'navigate',
+                        url: '/contractor-login',
+                        text: 'Contractor Login'
+                    }
+                ]
+            };
+        } else if (lowerMsg.includes('help')) {
+            return {
+                text: 'I can help you with:\n- Reporting issues\n- Tracking grievances\n- Login assistance\n- General information\n\nWhat do you need help with?'
+            };
+        } else {
+            return {
+                text: "I'm here to help with UrbanUnity services. You can ask me about reporting issues, tracking grievances, or logging in to your account."
+            };
+        }
+    }
+    
+    // Add floating chat button
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatButton = document.createElement('div');
+        chatButton.innerHTML = '<i class="fas fa-comment-dots"></i>';
+        chatButton.style.position = 'fixed';
+        chatButton.style.bottom = '30px';
+        chatButton.style.right = '30px';
+        chatButton.style.width = '60px';
+        chatButton.style.height = '60px';
+        chatButton.style.backgroundColor = '#1e3c72';
+        chatButton.style.color = 'white';
+        chatButton.style.borderRadius = '50%';
+        chatButton.style.display = 'flex';
+        chatButton.style.justifyContent = 'center';
+        chatButton.style.alignItems = 'center';
+        chatButton.style.fontSize = '1.5rem';
+        chatButton.style.cursor = 'pointer';
+        chatButton.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
+        chatButton.style.zIndex = '999';
+        chatButton.addEventListener('click', openChatbot);
+        document.body.appendChild(chatButton);
+    });
+</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Urban Unity - Feedback</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1050;
+  padding: 0.5rem 1rem; /* Add some padding */
+}
+
+.navbar .container-fluid {
+  padding-left: 0; /* Remove left padding to push logo to edge */
+}
+
+.navbar-brand {
+  margin-right: auto; /* Push other content to the right */
+  padding-left: 15px; /* Add some padding to the logo */
+}
+
+.navbar-brand img {
+  height: 45px;
+}
+
+    .btn-outline-primary {
+      color: #005bb5;
+      border: 1px solid #005bb5;
+      background-color: transparent;
+    }
+
+    .btn-outline-primary:hover {
+      background-color: #005bb5;
+      color: #ffffff;
+    }
+
+    .btn-primary {
+      background-color: #005bb5;
+      color: #ffffff;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #003f8a;
+      color: #ffffff;
+    }
+
+    .vertical-nav {
+      position: fixed;
+      top: 70px;
+      left: 0;
+      width: 250px;
+      height: calc(100vh - 70px);
+      background-color: #f8f9fa;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      z-index: 1040;
+    }
+
+    .vertical-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .vertical-nav ul li {
+      padding: 15px 20px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .vertical-nav ul li a {
+      text-decoration: none;
+      color: #005bb5;
+      font-size: 16px;
+    }
+
+    .content {
+      padding-top: 70px;
+      padding-left: 260px;
+      min-height: calc(100vh - 70px);
+    }
+
+    .section-title {
+      color: #005bb5;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #eaeaea;
+    }
+
+    .card {
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .rating-stars {
+      font-size: 2rem;
+      color: #ffc107;
+      cursor: pointer;
+    }
+
+    .feedback-list-item {
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      margin-bottom: 15px;
+      transition: transform 0.2s;
+    }
+
+    .feedback-list-item:hover {
+      transform: translateY(-3px);
+    }
+
+    .feedback-meta {
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    footer {
+      background-color: #f8f9fa;
+      padding: 20px 0;
+      margin-top: 30px;
+      border-top: 1px solid #eaeaea;
+      text-align: center;
+      margin-left: 250px;
+    }
+
+    .filter-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.filter-container select {
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: 1px solid #ced4da;
+  background-color: white;
+}
+
+.filter-container button {
+  padding: 8px 16px;
+}
+  
+#chatbot-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 350px;
+        height: 500px;
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 1000;
+        transition: all 0.3s ease;
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+    #chatbot-container.minimized {
+        height: 60px;
+        width: 250px;
+    }
+    
+    #chatbot-container.hidden {
+        transform: translateY(100px);
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    .chatbot-header {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .chatbot-title {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .chatbot-controls {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .chatbot-controls button {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 0.9rem;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+    
+    .chatbot-controls button:hover {
+        opacity: 1;
+    }
+    
+    .chatbot-messages {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background-color: #f5f7fa;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .chatbot-message {
+        max-width: 80%;
+        padding: 10px 15px;
+        border-radius: 18px;
+        word-wrap: break-word;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        position: relative;
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    .user-message {
+        align-self: flex-end;
+        background-color: #e3f2fd;
+        color: #1e3c72;
+        border-bottom-right-radius: 5px;
+    }
+    
+    .bot-message {
+        align-self: flex-start;
+        background-color: white;
+        color: #333;
+        border-bottom-left-radius: 5px;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .message-timestamp {
+        font-size: 0.7rem;
+        color: #666;
+        margin-top: 4px;
+        text-align: right;
+    }
+    
+    .chatbot-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    
+    .chatbot-action {
+        background-color: #1e3c72;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .chatbot-action:hover {
+        background-color: #2a5298;
+    }
+    
+    .chatbot-input {
+        display: flex;
+        padding: 10px;
+        background-color: white;
+        border-top: 1px solid #eee;
+    }
+    
+    .chatbot-input input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        outline: none;
+        font-size: 0.9rem;
+    }
+    
+    .chatbot-input button {
+        background: #1e3c72;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        margin-left: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .chatbot-input button:hover {
+        background: #2a5298;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+
+  </style>
+</head>
+<body>
+
+<!-- Horizontal Navbar -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid"> <!-- Changed to container-fluid -->
+    <a class="navbar-brand" href="{{ url_for('home') }}"> <!-- Removed ms-1 -->
+      <img src="{{ url_for('static', filename='images/logos.png') }}" alt="UrbanUnity Logo">
+    </a>
+    <div class="d-flex">
+      <span class="me-3 text-primary fw-bold">Welcome, {{ username }}</span>
+      <a href="{{ url_for('logout') }}" class="btn btn-outline-primary me-2">Logout</a>
+      <a href="{{ url_for('report_issue') }}" class="btn btn-primary">
+        <i class="bi bi-plus"></i> Report Issue
+      </a>              
+    </div>
+  </div>
+</nav>
+
+  <!-- Fixed Vertical Navbar -->
+  <div class="vertical-nav">
+    <ul>
+      <div class="vertical-nav">
+        <ul>
+          <li><a href="javascript:history.back()">Event Updates</a></li>
+          <li><a href="{{ url_for('track_grievance') }}">Service Tracking</a></li>
+          <li><a href="{{ url_for('view_feedback') }}">Community Feedback</a></li>
+        </ul>
+      </div>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <div class="container mt-4">
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <div class="row mb-5">
+        <div class="col-12">
+          <h2 class="section-title">Community Feedback</h2>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Feedback Form -->
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">Share Your Feedback</h5>
+            </div>
+            <div class="card-body">
+              <form action="{{ url_for('submit_feedback') }}" method="POST">
+                <div class="mb-3">
+                  <label for="feedback_text" class="form-label">Your Feedback</label>
+                  <textarea class="form-control" id="feedback_text" name="feedback_text" rows="5" required placeholder="Tell us about your experience with Urban Unity..."></textarea>
+                </div>
+                
+                <div class="mb-4">
+                  <label class="form-label">Rate Your Experience</label>
+                  <div class="rating-stars d-flex justify-content-center mb-3">
+                    <i class="bi bi-star" data-rating="1"></i>
+                    <i class="bi bi-star" data-rating="2"></i>
+                    <i class="bi bi-star" data-rating="3"></i>
+                    <i class="bi bi-star" data-rating="4"></i>
+                    <i class="bi bi-star" data-rating="5"></i>
+                  </div>
+                  <input type="hidden" name="rating" id="rating_value">
+                </div>
+                
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Your Previous Feedback -->
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header bg-light">
+              <h5 class="mb-0">Your Previous Feedback</h5>
+            </div>
+            <div class="card-body">
+              {% if user_feedback %}
+                <div class="list-group">
+                  {% for feedback in user_feedback %}
+                    <div class="list-group-item feedback-list-item">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="feedback-stars">
+                          {% for i in range(1, 6) %}
+                            {% if i <= feedback.rating|default(0) %}
+                              <i class="bi bi-star-fill text-warning"></i>
+                            {% else %}
+                              <i class="bi bi-star text-warning"></i>
+                            {% endif %}
+                          {% endfor %}
+                        </div>
+                        <span class="feedback-meta">{{ feedback.submitted_at.strftime('%B %d, %Y') }}</span>
+                      </div>
+                      <p class="mb-1">{{ feedback.feedback_text }}</p>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="text-center py-4">
+                  <i class="bi bi-chat-square-text text-muted" style="font-size: 3rem;"></i>
+                  <p class="mt-3">You haven't submitted any feedback yet.</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Community Guidelines -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="card bg-light">
+            <div class="card-body">
+              <h5><i class="bi bi-info-circle me-2"></i> Feedback Guidelines</h5>
+              <p class="mb-0">Your feedback helps us improve our services. Please be specific, constructive, and respectful. All feedback is reviewed by our team to enhance Urban Unity services.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <p>&copy; 2025 Urban Unity. All rights reserved.</p>
+            <div class="d-flex justify-content-center gap-3">
+              <a href="#" class="text-secondary"><i class="bi bi-facebook"></i></a>
+              <a href="#" class="text-secondary"><i class="bi bi-twitter"></i></a>
+              <a href="#" class="text-secondary"><i class="bi bi-instagram"></i></a>
+              <a href="#" class="text-secondary"><i class="bi bi-linkedin"></i></a>
+            </div>
+            <p class="mt-2 small text-muted">Contact: support@urbanunity.com | (555) 123-4567</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Combined script with both star rating AND filter functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      // 1. Star Rating Functionality (keep your existing code)
+      const stars = document.querySelectorAll('.rating-stars i');
+      const ratingInput = document.getElementById('rating_value');
+      
+      stars.forEach(star => {
+        star.addEventListener('mouseover', function() {
+          const rating = this.getAttribute('data-rating');
+          highlightStars(rating);
+        });
+        
+        star.addEventListener('mouseout', function() {
+          highlightStars(ratingInput.value);
+        });
+        
+        star.addEventListener('click', function() {
+          const rating = this.getAttribute('data-rating');
+          ratingInput.value = rating;
+          highlightStars(rating);
+        });
+      });
+      
+      function highlightStars(rating) {
+        stars.forEach(star => {
+          const starRating = star.getAttribute('data-rating');
+          if (starRating <= rating) {
+            star.classList.remove('bi-star');
+            star.classList.add('bi-star-fill');
+          } else {
+            star.classList.remove('bi-star-fill');
+            star.classList.add('bi-star');
+          }
+        });
+      }
+  
+      // 2. Grievance Status Check Functionality (new addition)
+      function checkStatus(grievanceId) {
+        fetch(`/check-update/${grievanceId}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.updated) {
+              location.reload();
+            } else {
+              alert('No updates available for this grievance yet.');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('Error checking for updates.');
+          });
+      }
+      
+      // Make checkStatus available globally
+      window.checkStatus = checkStatus;
+    });
+
+    let chatbotVisible = false;
+    
+    function toggleChatbot() {
+        const chatbot = document.getElementById('chatbot-container');
+        if (chatbot.classList.contains('minimized')) {
+            chatbot.classList.remove('minimized');
+            chatbotVisible = true;
+        } else {
+            minimizeChatbot();
+        }
+    }
+    
+    function minimizeChatbot() {
+        document.getElementById('chatbot-container').classList.add('minimized');
+        chatbotVisible = false;
+    }
+    
+    function closeChatbot() {
+        document.getElementById('chatbot-container').classList.add('hidden');
+    }
+    
+    function openChatbot() {
+        const chatbot = document.getElementById('chatbot-container');
+        chatbot.classList.remove('hidden');
+        chatbot.classList.remove('minimized');
+        chatbotVisible = true;
+    }
+    
+    function handleChatInput(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    }
+    
+    function sendMessage() {
+        const input = document.getElementById('chatbot-input');
+        const message = input.value.trim();
+        
+        if (message) {
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Simulate bot response (replace with actual API call)
+            setTimeout(() => {
+                const botResponse = getBotResponse(message);
+                addMessage(botResponse.text, 'bot', botResponse.actions);
+            }, 800);
+        }
+    }
+    
+    function addMessage(text, sender, actions = null) {
+        const messagesContainer = document.getElementById('chatbot-messages');
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chatbot-message', `${sender}-message`);
+        
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        messageElement.innerHTML = `
+            ${text}
+            <div class="message-timestamp">${timeString}</div>
+            ${actions ? createActionButtons(actions) : ''}
+        `;
+        
+        messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    function createActionButtons(actions) {
+        let buttonsHTML = '<div class="chatbot-actions">';
+        actions.forEach(action => {
+            if (action.type === 'navigate') {
+                buttonsHTML += `<a href="${action.url}" class="chatbot-action">${action.text}</a>`;
+            }
+        });
+        buttonsHTML += '</div>';
+        return buttonsHTML;
+    }
+    
+    // Simple response logic (replace with your actual API calls)
+    function getBotResponse(message) {
+        const lowerMsg = message.toLowerCase();
+        
+        if (lowerMsg.includes('report') || lowerMsg.includes('issue') || lowerMsg.includes('grievance')) {
+            return {
+                text: 'You can report a new issue by clicking the button below:',
+                actions: [{
+                    type: 'navigate',
+                    url: '/report-issue',
+                    text: 'Report Issue'
+                }]
+            };
+        } else if (lowerMsg.includes('track') || lowerMsg.includes('status') || lowerMsg.includes('grievance')) {
+            return {
+                text: 'You can track your grievances here:',
+                actions: [{
+                    type: 'navigate',
+                    url: '/track-grievance',
+                    text: 'Track Grievances'
+                }]
+            };
+        } else if (lowerMsg.includes('login') || lowerMsg.includes('sign in')) {
+            return {
+                text: 'Please select your login type:',
+                actions: [
+                    {
+                        type: 'navigate',
+                        url: '/citizen-login',
+                        text: 'Citizen Login'
+                    },
+                    {
+                        type: 'navigate',
+                        url: '/admin-login',
+                        text: 'Admin Login'
+                    },
+                    {
+                        type: 'navigate',
+                        url: '/contractor-login',
+                        text: 'Contractor Login'
+                    }
+                ]
+            };
+        } else if (lowerMsg.includes('help')) {
+            return {
+                text: 'I can help you with:\n- Reporting issues\n- Tracking grievances\n- Login assistance\n- General information\n\nWhat do you need help with?'
+            };
+        } else {
+            return {
+                text: "I'm here to help with UrbanUnity services. You can ask me about reporting issues, tracking grievances, or logging in to your account."
+            };
+        }
+    }
+    
+    // Add floating chat button
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatButton = document.createElement('div');
+        chatButton.innerHTML = '<i class="fas fa-comment-dots"></i>';
+        chatButton.style.position = 'fixed';
+        chatButton.style.bottom = '30px';
+        chatButton.style.right = '30px';
+        chatButton.style.width = '60px';
+        chatButton.style.height = '60px';
+        chatButton.style.backgroundColor = '#1e3c72';
+        chatButton.style.color = 'white';
+        chatButton.style.borderRadius = '50%';
+        chatButton.style.display = 'flex';
+        chatButton.style.justifyContent = 'center';
+        chatButton.style.alignItems = 'center';
+        chatButton.style.fontSize = '1.5rem';
+        chatButton.style.cursor = 'pointer';
+        chatButton.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
+        chatButton.style.zIndex = '999';
+        chatButton.addEventListener('click', openChatbot);
+        document.body.appendChild(chatButton);
+    });
+  
+  </script>
+
+<div id="chatbot-container" class="hidden">
+  <div class="chatbot-header" onclick="toggleChatbot()">
+      <div class="chatbot-title">UrbanUnity Assistant</div>
+      <div class="chatbot-controls">
+          <button onclick="event.stopPropagation(); minimizeChatbot()"><i class="fas fa-minus"></i></button>
+          <button onclick="event.stopPropagation(); closeChatbot()"><i class="fas fa-times"></i></button>
+      </div>
+  </div>
+  <div class="chatbot-messages" id="chatbot-messages">
+      <div class="chatbot-message bot-message">
+          Hello! I'm your UrbanUnity assistant. How can I help you today?
+          <div class="message-timestamp">Just now</div>
+      </div>
+  </div>
+  <div class="chatbot-input">
+      <input type="text" id="chatbot-input" placeholder="Type your message..." onkeypress="handleChatInput(event)">
+      <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
+</body>
+</html>

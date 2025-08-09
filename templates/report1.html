@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Grievance</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: url("{{ url_for('static', filename='images/cbanner.jpg') }}") no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .navbar {
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      animation: slideIn 0.5s ease-in-out;
+    }
+
+    .navbar-brand img {
+      height: 35px;
+    }
+
+    .content {
+      padding-top: 100px;
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .form-container {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 500px;
+      opacity: 0;
+      animation: fadeInUp 1.5s ease-out forwards;
+    }
+
+    .form-title {
+      text-align: center;
+      color: blue;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #005bb5;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #003f8a;
+    }
+
+    .footer {
+      background: linear-gradient(135deg, #0066cc, #74b9ff);
+      color: white;
+      text-align: center;
+      padding: 10px;
+      width: 100%;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      font-size: 14px;
+    }
+
+    #map {
+      height: 300px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media screen and (max-width: 600px) {
+      .form-container {
+        padding: 20px;
+        max-width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{{ url_for('home') }}">
+        <img src="{{ url_for('static', filename='images/logos.png') }}" alt="UrbanUnity Logo">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="ms-auto d-flex gap-2">
+          <a href="{{ url_for('contractor_login') }}" class="btn btn-link">Contractor Login</a>
+          <a href="{{ url_for('admin_login') }}" class="btn btn-primary">Admin Login</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="content">
+    <div class="form-container">
+      <h1 class="form-title">Submit Grievance</h1>
+      <p class="form-subtitle">Please provide the necessary details</p>
+
+      <form id="grievanceForm" action="{{ url_for('submit_grievance') }}" method="POST" enctype="multipart/form-data">
+        <!-- Location Input -->
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location" placeholder="Enter a location" required>
+    
+        <!-- Map -->
+        <label for="map">Select Location on Map</label>
+        <div id="map"></div>
+    
+        <!-- Hidden input for latitude and longitude -->
+        <input type="hidden" id="latitude" name="latitude" />
+        <input type="hidden" id="longitude" name="longitude" />
+    
+        <!-- Grievance Description -->
+        <label for="description">Grievance Description</label>
+        <textarea id="description" name="description" rows="4" placeholder="Describe your grievance here" required></textarea>
+    
+        <!-- Upload Photo -->
+        <label for="photo">Upload Photo</label>
+        <input type="file" id="photo" name="photo" accept="image/*" required>
+    
+        <button type="submit">Submit Grievance</button>
+    </form>
+    
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Coordinates that roughly bound Kerala
+    const keralaBounds = [
+      [8.2828, 76.0414],  // Southwest coordinates
+      [12.5176, 77.3943]  // Northeast coordinates
+    ];
+
+    var map = L.map('map', {
+      minZoom: 8,  // Set a minimum zoom to prevent zooming out too far
+      maxBounds: keralaBounds,  // Restrict map to Kerala
+      maxZoom: 16
+    }).setView([9.9816, 76.2999], 12); // Default location: Ernakulam
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 20
+    }).addTo(map);
+
+    var marker;
+
+    function setMarker(lat, lng) {
+      if (marker) {
+        marker.setLatLng([lat, lng]);
+      } else {
+        marker = L.marker([lat, lng]).addTo(map);
+      }
+      document.getElementById('latitude').value = lat;
+      document.getElementById('longitude').value = lng;
+
+      // Reverse Geocode to get full address
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('location').value = data.display_name || "Unknown Location";
+        })
+        .catch(() => document.getElementById('location').value = "Unknown Location");
+    }
+
+    // Event listener for location input - Trigger search on Enter key press
+    document.getElementById('location').addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        var location = this.value;
+
+        if (location.length >= 5) {  // Trigger search after 5 characters
+          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${location}`)
+            .then(response => response.json())
+            .then(data => {
+              if (data.length > 0) {
+                var lat = data[0].lat;
+                var lon = data[0].lon;
+                map.setView([lat, lon], 17); // Zoom into the location
+                setMarker(lat, lon); // Place marker at location
+              } else {
+                alert("Location not found.");
+              }
+            })
+            .catch(() => alert("Failed to fetch location data."));
+        } else {
+          alert("Please enter a location with at least 5 characters.");
+        }
+      }
+    });
+
+    // Use Geolocation API if available to automatically fetch user's location
+    // Use Geolocation API if available to automatically fetch user's location
+if (navigator.geolocation) {
+  // Add a timeout option to the geolocation request
+  var options = {
+    enableHighAccuracy: true,
+    timeout: 5000,
+    maximumAge: 0
+  };
+  
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      var userLat = position.coords.latitude;
+      var userLng = position.coords.longitude;
+      
+      // Check if the coordinates are within Kerala bounds before setting
+      if (userLat >= keralaBounds[0][0] && userLat <= keralaBounds[1][0] &&
+          userLng >= keralaBounds[0][1] && userLng <= keralaBounds[1][1]) {
+        map.setView([userLat, userLng], 18);
+        setMarker(userLat, userLng);
+        console.log("Location detected:", userLat, userLng);
+      } else {
+        console.log("Location outside Kerala bounds, using default");
+        // Use default location for Kerala (Ernakulam)
+        map.setView([9.9816, 76.2999], 12);
+        setMarker(9.9816, 76.2999);
+      }
+    },
+    function(error) {
+      console.error("Geolocation error:", error.code, error.message);
+      // Use default location for Kerala (Ernakulam) as fallback
+      map.setView([9.9816, 76.2999], 12);
+      setMarker(9.9816, 76.2999);
+      
+      // Show appropriate error message based on error code
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          alert("Geolocation request denied. Using default location.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          alert("Location information unavailable. Using default location.");
+          break;
+        case error.TIMEOUT:
+          alert("Location request timed out. Using default location.");
+          break;
+        default:
+          alert("Unknown geolocation error. Using default location.");
+          break;
+      }
+    },
+    options
+  );
+} else {
+  alert("Geolocation is not supported by this browser. Please select your location manually.");
+  // Use default location
+  map.setView([9.9816, 76.2999], 12);
+  setMarker(9.9816, 76.2999);
+}
+
+    map.on('click', function(e) {
+      setMarker(e.latlng.lat, e.latlng.lng);
+    });
+
+    function validateForm() {
+      if (document.getElementById('description').value.trim() === "") {
+        alert("Please enter a grievance description!");
+        return false;
+      }
+      return true;
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

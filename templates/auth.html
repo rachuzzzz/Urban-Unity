@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Urban Unity</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1050;
+    }
+
+    .vertical-nav {
+      position: fixed;
+      top: 70px;
+      left: 0;
+      width: 250px;
+      height: calc(100vh - 70px);
+      background-color: #ffffff;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      padding-top: 10px;
+      overflow-y: auto;
+    }
+
+    .vertical-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .vertical-nav ul li {
+      padding: 15px 20px;
+      border: 2px solid #005bb5;
+      margin: 5px;
+      border-radius: 5px;
+      background-color: #e7f1ff;
+      text-align: center;
+      transition: background-color 0.3s;
+    }
+
+    .vertical-nav ul li:hover {
+      background-color: #cce5ff;
+    }
+
+    .vertical-nav ul li a {
+      text-decoration: none;
+      color: #005bb5;
+      font-size: 16px;
+      display: block;
+      font-weight: bold;
+    }
+
+    .content {
+      padding-top: 80px;
+      padding-left: 270px;
+      overflow-x: auto;
+    }
+
+    .dashboard-container {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .issue-card {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+
+    .issue-card.emergency {
+      background-color: #ffcccc;
+      border-left: 5px solid red;
+    }
+
+    .issue-card.reported {
+      background-color: #fff3cd;
+      border-left: 5px solid orange;
+    }
+
+    @media (max-width: 768px) {
+      .vertical-nav {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      .content {
+        padding-left: 0;
+        padding-top: 120px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <img src="logos.png" alt="UrbanUnity Logo" height="45">
+      </a>
+    </div>
+  </nav>
+
+  <div class="vertical-nav">
+    <ul>
+      <li><a href="#">Dashboard</a></li>
+      <li><a href="#">Manage Issues</a></li>
+      <li><a href="#">Contractor Assignments</a></li>
+      <li><a href="#">Reports & Analytics</a></li>
+      <li><a href="#">Settings</a></li>
+    </ul>
+  </div>
+
+  <div class="content">
+    <div class="dashboard-container">
+      <h2>Admin Dashboard</h2>
+      <p>Welcome, [Administrator]. Below are the latest reported issues:</p>
+      <div id="reported-events" class="mt-4">
+        <div class="issue-card emergency">
+          <strong>Emergency:</strong> Large pothole on Main Street causing traffic delays.
+        </div>
+        <div class="issue-card emergency">
+          <strong>Emergency:</strong> Broken streetlight in downtown area, security risk.
+        </div>
+        <div class="issue-card reported">
+          <strong>Reported:</strong> Garbage overflow near Market Square.
+        </div>
+        <div class="issue-card reported">
+          <strong>Reported:</strong> Water leakage on 5th Avenue sidewalk.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

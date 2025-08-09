@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Grievance Status - Urban Unity</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1050;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .vertical-nav {
+      position: fixed;
+      top: 70px;
+      left: 0;
+      width: 250px;
+      height: calc(100vh - 70px);
+      background-color: #ffffff;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      padding-top: 10px;
+      overflow-y: auto;
+      border-right: 1px solid #ccc;
+    }
+
+    .vertical-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .vertical-nav ul li {
+      padding: 15px 20px;
+      margin: 5px;
+      border-radius: 5px;
+      text-align: center;
+      transition: background-color 0.3s;
+    }
+
+    .vertical-nav ul li a {
+      display: block;
+      background-color: #007bff;
+      color: #ffffff;
+      padding: 10px 15px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-bottom: 5px;
+    }
+
+    .vertical-nav ul li a:hover {
+      background-color: #0056b3;
+    }
+
+    .content {
+      padding-top: 80px;
+      padding-left: 270px;
+      overflow-x: auto;
+    }
+
+    .dashboard-container {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-card {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .status-card.pending {
+      border-left: 5px solid #ffc107;
+    }
+
+    .status-card.assigned {
+      border-left: 5px solid #17a2b8;
+    }
+
+    .status-card.resolved {
+      border-left: 5px solid #28a745;
+    }
+    
+    .status-card.emergency {
+      border-left: 5px solid #dc3545;
+    }
+
+    .status-badge {
+      font-size: 0.85rem;
+      padding: 5px 10px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .pending-badge {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .assigned-badge {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .resolved-badge {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .emergency-badge {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .status-timeline {
+      display: flex;
+      margin: 20px 0;
+      position: relative;
+    }
+
+    .timeline-step {
+      flex: 1;
+      text-align: center;
+      padding-top: 40px;
+      position: relative;
+    }
+
+    .timeline-step:before {
+      content: '';
+      position: absolute;
+      height: 4px;
+      background-color: #ddd;
+      top: 20px;
+      left: 0;
+      right: 0;
+    }
+
+    .timeline-step:first-child:before {
+      left: 50%;
+    }
+
+    .timeline-step:last-child:before {
+      right: 50%;
+    }
+
+    .timeline-step.active:before,
+    .timeline-step.active ~ .timeline-step:before {
+      background-color: #007bff;
+    }
+
+    .timeline-step .step-indicator {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 7px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+
+    .timeline-step.active .step-indicator {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .timeline-step .step-label {
+      font-size: 0.9rem;
+      color: #777;
+    }
+
+    .timeline-step.active .step-label {
+      color: #007bff;
+      font-weight: bold;
+    }
+
+    .feedback-btn {
+      margin-top: 10px;
+    }
+
+    .filter-container {
+      margin-bottom: 20px;
+    }
+
+    .filter-container select {
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+
+    .filter-container button {
+      padding: 5px 10px;
+      margin-left: 10px;
+      background-color: #007bff;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .issue-image {
+      max-width: 100%;
+      height: auto;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .vertical-nav {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      .content {
+        padding-left: 0;
+        padding-top: 120px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="{{ url_for('static', filename='images/logos.png') }}" alt="UrbanUnity Logo" height="45">
+      </a>
+      <div class="ml-auto">
+        <span class="navbar-text">
+          <i class="bi bi-person-circle"></i> {{ username }}
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="vertical-nav">
+    <ul>
+      <li><a href="{{ url_for('report_issue') }}"><i class="bi bi-exclamation-circle"></i> Report Issue</a></li>
+      <li><a href="{{ url_for('view_feedback') }}"><i class="bi bi-chat-dots"></i> Feedback</a></li>
+      <li><a href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+    </ul>
+  </div>
+
+  <div class="content">
+    <div class="dashboard-container">
+      <h2><i class="bi bi-binoculars"></i> Track Your Grievances</h2>
+      <p>View the current status of all grievances you've reported. We keep you updated at every step.</p>
+      
+      <!-- Filter Section -->
+<div class="filter-container">
+  <form method="GET" action="{{ url_for('track_grievance') }}">
+    <select name="status" id="statusFilter" class="form-select">
+      <option value="all" {% if request.args.get('status', 'all') == 'all' %}selected{% endif %}>All Grievances</option>
+      <option value="pending" {% if request.args.get('status') == 'pending' %}selected{% endif %}>Pending</option>
+      <option value="In Progress" {% if request.args.get('status') == 'In Progress' %}selected{% endif %}>In Progress</option>
+      <option value="Resolved" {% if request.args.get('status') == 'Resolved' %}selected{% endif %}>Resolved</option>
+    </select>
+    
+    <select name="date" id="dateFilter" class="form-select">
+      <option value="all" {% if request.args.get('date', 'all') == 'all' %}selected{% endif %}>All Time</option>
+      <option value="week" {% if request.args.get('date') == 'week' %}selected{% endif %}>Last Week</option>
+      <option value="month" {% if request.args.get('date') == 'month' %}selected{% endif %}>Last Month</option>
+      <option value="year" {% if request.args.get('date') == 'year' %}selected{% endif %}>Last Year</option>
+    </select>
+    
+    <button type="submit" class="btn btn-primary">Apply Filters</button>
+    {% if request.args.get('status') or request.args.get('date') %}
+      <a href="{{ url_for('track_grievance') }}" class="btn btn-outline-secondary">Clear Filters</a>
+    {% endif %}
+  </form>
+</div>
+
+      <div class="grievance-list">
+        {% if grievances %}
+          {% for grievance in grievances %}
+            <!-- Grievance Card -->
+           <!-- Inside the grievance card -->
+<div class="status-card {{ grievance.status|lower|replace(' ', '-') }}">
+  <div class="row">
+    <div class="col-md-8">
+      <!-- Header and status badge -->
+      <div class="d-flex justify-content-between">
+        <h5>Grievance #{{ grievance.id }}</h5>
+        {% if grievance.status == 'pending' %}
+          <span class="status-badge pending-badge">Pending</span>
+        {% elif grievance.status == 'In Progress' %}
+          <span class="status-badge assigned-badge">In Progress</span>
+        {% elif grievance.status == 'Resolved' %}
+          <span class="status-badge resolved-badge">Resolved</span>
+        {% elif grievance.status == 'completed' %}
+          <span class="status-badge resolved-badge">Completed</span>
+        {% endif %}
+      </div>
+      
+      <!-- Location and description -->
+      <p><strong>Location:</strong> {{ grievance.location }}</p>
+      <p><strong>Reported on:</strong> {{ grievance.submitted_at.strftime('%d %b %Y, %I:%M %p') }}</p>
+      <p><strong>Description:</strong> {{ grievance.description }}</p>
+      
+      <!-- Status Timeline - Fixed Structure -->
+      <div class="status-timeline">
+        <div class="timeline-step active">
+          <div class="step-indicator"><i class="bi bi-file-earmark-plus"></i></div>
+          <div class="step-label">Reported</div>
+        </div>
+        
+        <div class="timeline-step {% if grievance.status in ['In Progress', 'Resolved', 'completed'] %}active{% endif %}">
+          <div class="step-indicator"><i class="bi bi-tools"></i></div>
+          <div class="step-label">In Progress</div>
+        </div>
+        
+        <div class="timeline-step {% if grievance.status in ['Resolved', 'completed'] %}active{% endif %}">
+          <div class="step-indicator"><i class="bi bi-check2-circle"></i></div>
+          <div class="step-label">Resolved</div>
+        </div>
+      </div> <!-- Closing status-timeline div -->
+      
+      <!-- Last Update -->
+      <p class="text-muted mt-2">
+        <small>
+          <i class="bi bi-clock-history"></i> Last updated: 
+          {% if grievance.status == 'pending' %}
+            {{ grievance.submitted_at.strftime('%d %b %Y, %I:%M %p') }}
+          {% elif grievance.status == 'In Progress' %}
+            {{ grievance.submitted_at.strftime('%d %b %Y, %I:%M %p') }}
+          {% elif grievance.status == 'Resolved' %}
+            {{ grievance.submitted_at.strftime('%d %b %Y, %I:%M %p') }}
+          {% endif %}
+        </small>
+      </p>
+      
+      <!-- Action Buttons -->
+      {% if grievance.status == 'completed' %}
+        <button class="btn btn-primary btn-sm feedback-btn" data-bs-toggle="modal" data-bs-target="#feedbackModal{{ grievance.id }}">
+          <i class="bi bi-chat-square-text"></i> Provide Feedback
+        </button>
+      {% else %}
+        <button class="btn btn-outline-secondary btn-sm feedback-btn" onclick="checkStatus({{ grievance.id }})">
+          <i class="bi bi-arrow-clockwise"></i> Check for Updates
+        </button>
+      {% endif %}
+    </div> <!-- Closing first col-md-8 div -->
+    
+    <div class="col-md-4">
+      <!-- Photo if available -->
+      {% if grievance.photo_path %}
+        <img src="{{ grievance.photo_path }}" alt="Grievance Photo" class="issue-image">
+      {% else %}
+        <div class="text-center mt-4">
+          <i class="bi bi-card-image text-muted" style="font-size: 5rem;"></i>
+          <p class="text-muted">No image provided</p>
+        </div>
+      {% endif %}
+    </div> <!-- Closing col-md-4 div -->
+  </div> <!-- Closing row div -->
+</div> <!-- Closing status-card div -->
+            
+            <!-- Feedback Modal -->
+            <div class="modal fade" id="feedbackModal{{ grievance.id }}" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="feedbackModalLabel">Provide Feedback</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form>
+                      <div class="mb-3">
+                        <label for="satisfactionRating" class="form-label">How satisfied are you with the resolution?</label>
+                        <select class="form-select" id="satisfactionRating">
+                          <option value="5">Very Satisfied</option>
+                          <option value="4">Satisfied</option>
+                          <option value="3">Neutral</option>
+                          <option value="2">Dissatisfied</option>
+                          <option value="1">Very Dissatisfied</option>
+                        </select>
+                      </div>
+                      <div class="mb-3">
+                        <label for="feedbackComments" class="form-label">Additional Comments</label>
+                        <textarea class="form-control" id="feedbackComments" rows="3" placeholder="Tell us more about your experience..."></textarea>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Submit Feedback</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="alert alert-info mt-4">
+            <i class="bi bi-info-circle"></i> You haven't reported any grievances yet. 
+            <a href="{{ url_for('report_issue') }}" class="alert-link">Report an issue</a> to get started.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function checkStatus(grievanceId) {
+      // This would typically make an AJAX call to check for updates
+      // For demo purposes, just show an alert
+      alert('Checking for updates on grievance #' + grievanceId + '...\n\nNo new updates found.');
+    }
+    
+    // Filter functionality
+    document.getElementById('applyFilter').addEventListener('click', function() {
+      const statusFilter = document.getElementById('statusFilter').value;
+      const dateFilter = document.getElementById('dateFilter').value;
+      
+      // This would typically submit the form or make an AJAX call
+      // For demo purposes, just show an alert
+      alert(`Filtering by status: ${statusFilter}, date: ${dateFilter}`);
+      
+      // In a real implementation, you would add logic to filter the grievances
+      // window.location.href = `/track-grievance?status=${statusFilter}&date=${dateFilter}`;
+    });
+  </script>
+</body>
+</html>

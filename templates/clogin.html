@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Citizen Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0066cc, #74b9ff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #ffffff;
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      max-width: 450px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 15px;
+      color: #005bb5;
+    }
+
+    p {
+      font-size: 14px;
+      margin-bottom: 20px;
+      color: #005bb5;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 5px;
+      color: #333333;
+      text-align: left;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: 0.3s ease;
+    }
+
+    input:hover, select:hover {
+      border-color: #0066cc;
+      box-shadow: 0 4px 8px rgba(0, 102, 204, 0.1);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #005bb5;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #003f8a;
+    }
+
+    .help-text {
+      margin-top: 15px;
+      font-size: 13px;
+      color: #666666;
+    }
+
+    .help-text a {
+      color: #005bb5;
+      text-decoration: none;
+    }
+
+    .help-text a:hover {
+      text-decoration: underline;
+    }
+
+    /* Form error styling */
+    .error {
+      color: red;
+      font-size: 12px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form id="loginForm" class="login-form">
+      <h1>Citizen Login</h1>
+      <p>Please enter your details to continue</p>
+
+      <label for="first-name">First Name</label>
+      <input type="text" id="first-name" placeholder="First Name" required>
+      <div class="error" id="first-name-error"></div>
+      
+      <label for="last-name">Last Name</label>
+      <input type="text" id="last-name" placeholder="Last Name" required>
+      <div class="error" id="last-name-error"></div>
+      
+      <label for="phone">Phone Number</label>
+      <input type="text" id="phone" placeholder="Phone Number" required>
+      <div class="error" id="phone-error"></div>
+      
+      <label for="city">City</label>
+      <select id="city" required>
+        <option value="" disabled selected>Select a city</option>
+        <option value="Allapra">Allapra</option>
+        <option value="Ambalamedu">Ambalamedu</option>
+        <option value="Angamaly">Angamaly</option>
+        <option value="Arakkunnam">Arakkunnam</option>
+        <option value="Chembarakky">Chembarakky</option>
+        <option value="Chendamangalam">Chendamangalam</option>
+        <option value="Chengamanad">Chengamanad</option>
+        <option value="Cheranallur">Cheranallur</option>
+        <option value="Cheruvattoor">Cheruvattoor</option>
+        <option value="Choornikkara">Choornikkara</option>
+        <option value="Chottanikkara">Chottanikkara</option>
+        <option value="Chowwara">Chowwara</option>
+        <option value="Edachira">Edachira</option>
+        <option value="Edathala">Edathala</option>
+        <option value="Eloor">Eloor</option>
+        <option value="Ernakulam">Ernakulam</option>
+        <option value="Irumpanam">Irumpanam</option>
+        <option value="Kadamakkudy">Kadamakkudy Islands</option>
+        <option value="Kadayiruppu">Kadayiruppu</option>
+        <option value="Kadungalloor">Kadungalloor</option>
+        <option value="Kalady">Kalady</option>
+        <option value="Kanjoor">Kanjoor</option>
+        <option value="Kakkanad">Kakkanad</option>
+        <option value="Kaprikkad">Kaprikkad</option>
+        <option value="Keezhmad">Keezhmad</option>
+        <option value="Kochi">Kochi</option>
+        <option value="Kolenchery">Kolenchery</option>
+        <option value="Koonammavu">Koonammavu</option>
+        <option value="Koothattukulam">Koothattukulam</option>
+        <option value="Kothamangalam">Kothamangalam</option>
+        <option value="Kottuvally">Kottuvally</option>
+        <option value="Kundannoor">Kundannoor</option>
+        <option value="Kunnukara">Kunnukara</option>
+        <option value="Kureekkad">Kureekkad</option>
+        <option value="Malayattoor">Malayattoor</option>
+        <option value="Malayidomthuruth">Malayidomthuruth</option>
+        <option value="Manjaly">Manjaly</option>
+        <option value="Maradu">Maradu</option>
+        <option value="Mattoor">Mattoor</option>
+        <option value="Moolampilly">Moolampilly</option>
+        <option value="Muvattupuzha">Muvattupuzha</option>
+        <option value="Nayarambalam">Nayarambalam</option>
+        <option value="Nedumbassery">Nedumbassery</option>
+        <option value="Nedungad">Nedungad</option>
+        <option value="North Paravur">North Paravur</option>
+        <option value="Oorakkad">Oorakkad</option>
+        <option value="Palliyangadi">Palliyangadi</option>
+        <option value="Pampakuda">Pampakuda</option>
+        <option value="Payyal">Payyal</option>
+        <option value="Perumbavoor">Perumbavoor</option>
+        <option value="Perumpadappu">Perumpadappu</option>
+        <option value="Pezhakkappilly">Pezhakkappilly</option>
+        <option value="Piravom">Piravom</option>
+        <option value="Pizhala">Pizhala</option>
+        <option value="Ponjassery">Ponjassery</option>
+        <option value="Pukkattupadi">Pukkattupadi</option>
+        <option value="Puliyanam">Puliyanam</option>
+        <option value="Thamarachal">Thamarachal</option>
+        <option value="Thiruvankulam">Thiruvankulam</option>
+        <option value="Thottakkattukara">Thottakkattukara</option>
+        <option value="Thuruthipilly">Thuruthipilly</option>
+        <option value="Udayamperoor">Udayamperoor</option>
+        <option value="Varappuzha">Varappuzha</option>
+        <option value="Vazhakkala">Vazhakkala</option>
+        <option value="Vazhakulam">Vazhakulam</option>
+        <option value="Venduvazhy">Venduvazhy</option>
+        <option value="Vengoor">Vengoor</option>
+      </select>
+      
+      <button type="submit">Submit</button>
+      <p class="help-text">Need help? <a href="#">Contact Support</a></p>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      // Get input values
+      const firstName = document.getElementById('first-name');
+      const lastName = document.getElementById('last-name');
+      const phone = document.getElementById('phone');
+
+      // Error elements
+      const firstNameError = document.getElementById('first-name-error');
+      const lastNameError = document.getElementById('last-name-error');
+      const phoneError = document.getElementById('phone-error');
+
+      // Clear previous errors
+      firstNameError.textContent = '';
+      lastNameError.textContent = '';
+      phoneError.textContent = '';
+
+      let isValid = true;
+
+      // Validate first name
+      if (!/^[a-zA-Z]+$/.test(firstName.value)) {
+        firstNameError.textContent = 'First name must contain only alphabets.';
+        isValid = false;
+      }
+
+      // Validate last name
+      if (!/^[a-zA-Z]+$/.test(lastName.value)) {
+        lastNameError.textContent = 'Last name must contain only alphabets.';
+        isValid = false;
+      }
+
+      // Validate phone number
+      if (!/^\d{10}$/.test(phone.value)) {
+        phoneError.textContent = 'Phone number must be exactly 10 digits.';
+        isValid = false;
+      }
+
+      // If valid, submit the form (for demonstration, just show an alert)
+      if (isValid) {
+        alert('Form Submitted Successfully!');
+      }
+    });
+  </script>
+</body>
+</html>

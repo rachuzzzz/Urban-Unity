@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UrbanUnity - Home</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand img {
+            height: 35px;
+        }
+
+        .banner {
+            background-color: #eef3ff;
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .banner img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .features .feature-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .feature-item img {
+            width: 50px;
+            height: auto;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 10px;
+            text-align: left;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: auto; /* Adjusted width */
+            max-width: 300px; /* Optional: to limit the width */
+            font-size: 10px; /* Reduced font size */
+            border-top-right-radius: 10px; /* Optional: rounded corner */
+        }
+
+        .footer img {
+            width: 10px; /* Reduced icon size */
+            height: auto;
+        }
+
+        .footer span {
+            font-size: 10px; /* Reduced text size */
+        }
+
+        @media (max-width: 768px) {
+            .navbar .ms-auto {
+                text-align: center;
+                width: 100%;
+            }
+            .features .row {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='images/logos.png') }}" alt="UrbanUnity Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="ms-auto dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="loginDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Login
+                    </button>
+                    <ul class="dropdown-menu p-2" aria-labelledby="loginDropdown">
+                         <li><a class="btn btn-outline-primary w-100 mb-1" href="{{ url_for('citizen_login') }}">Citizen Login</a></li>
+                        <li><a class="btn btn-outline-success w-100 mb-1" href="{{ url_for('admin_login') }}">Admin Login</a></li>
+                        <li><a class="btn btn-outline-danger w-100" href="{{ url_for('contractor_login') }}">Contractor Login</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="banner">
+         <img src="{{ url_for('static', filename='images/Banner.png') }}" class="img-fluid" alt="City Illustration">
+        <h2>Transform Your Community Experience</h2>
+        <p>Urban Unity connects citizens with local authorities through a seamless digital platform.</p>
+        <a href="{{ url_for('signup') }}" class="btn btn-primary">Sign Up Now</a>
+    </div>
+
+    <div class="container features">
+        <div class="row">
+            <div class="col-md-4 feature-item">
+                <img src="{{ url_for('static', filename='images/communication.png') }}" alt="Easy Communication">
+                <h5>Easy Communication</h5>
+                <p>Direct channel between citizens and authorities</p>
+            </div>
+            <div class="col-md-4 feature-item">
+                <img src="{{ url_for('static', filename='images/chat.png') }}" alt="Event Notifications">
+                <h5>Event Notifications</h5>
+                <p>Stay updated with community events and announcements</p>
+            </div>
+            <div class="col-md-4 feature-item">
+                <img src="{{ url_for('static', filename='images/service.png') }}" alt="Service Requests">
+                <h5>Service Requests</h5>
+                <h5>Service Requests</h5>
+                <p>Submit and track municipal service requests</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div>
+            <img src="{{ url_for('static', filename='images/email.png') }}" alt="Email"> 
+            <span>support@urbanunity.com</span> &nbsp; | &nbsp;
+            <img src="{{ url_for('static', filename='images/phone.png') }}" alt="Phone"> 
+            <span>1-800-URBAN-UNITY</span>
+        </div>
+        <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
